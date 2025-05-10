@@ -51,14 +51,16 @@ Grafana — это инструмент для визуализации метр
 Alerting в Grafana позволяет отправлять алерты прямо с графиков (альтернатива Alertmanager).
 Grafana делает мониторинг наглядным и доступным для анализа даже не техническими пользователями.
 Пример установки Grafana (для Linux Ubuntu):
-'''sudo apt-get install -y apt-transport-https
+```
+sudo apt-get install -y apt-transport-https
 sudo apt-get install -y software-properties-common wget
 wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
 sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
 sudo apt-get update
 sudo apt-get install grafana
 sudo systemctl start grafana-server
-sudo systemctl enable grafana-server'''
+sudo systemctl enable grafana-server
+```
 
 
 **5. Как работает роутинг алертов в Prometheus?**
@@ -68,7 +70,8 @@ sudo systemctl enable grafana-server'''
 -	при каких условиях (фильтры, теги, приоритеты),
 -	как группировать и подавлять повторяющиеся оповещения.
 Типичная структура основного файла конфигурации Alertmanager:
-'''global:
+```
+ 	global:
   resolve_timeout: 5m
 
 route:
@@ -97,20 +100,21 @@ receivers:
 
   - name: dba-team
     email_configs:
-      - to: 'dba@example.com' '''
+      - to: 'dba@example.com'
+```
 *1. global:*
 Глобальные настройки (например, время ожидания подтверждения).
-*2. route:*
+*2. route:*  
 Главная логика маршрутизации:
-receiver — куда идут алерты по умолчанию.
-group_by — как группировать похожие алерты;
-group_wait — сколько ждать перед отправкой группы алертов;
-group_interval — как часто повторять уведомление для одной группы;
-repeat_interval — как часто повторять тот же алерт.
-*3. routes:*
+- receiver — куда идут алерты по умолчанию.
+- group_by — как группировать похожие алерты;
+- group_wait — сколько ждать перед отправкой группы алертов;
+- group_interval — как часто повторять уведомление для одной группы;
+- repeat_interval — как часто повторять тот же алерт.
+*3. routes:*  
 Уточненные правила роутинга.
 Если алерт удовлетворяет match, он отправляется в указанный receiver.
-*4. receivers:*
+*4. receivers:*  
 Список всех получателей. У каждого указывается способ доставки:
 email_configs;
 slack_configs;
@@ -118,25 +122,31 @@ telegram_configs (через webhook);
 webhook_configs и др.
 
 **6. Как тестировать алерты?**
-Тестирование алертов позволяет убедиться, что они срабатывают корректно.
-Методы тестирования:
+Тестирование алертов позволяет убедиться, что они срабатывают корректно.  
+Методы тестирования:  
 -	Promtool — утилита для проверки синтаксиса и логики алертов:
-‘’’promtool check rules alert.rules’’’
+```
+ 	promtool check rules alert.rules
+```
 -	Флаг --web.enable-lifecycle — позволяет перезагружать правила без рестарта Prometheus:
-‘’’curl -X POST http://localhost:9090/-/reload’’’
+```
+curl -X POST http://localhost:9090/-/reload
+```
 -	Запуск с тестовым конфигом и метриками — можно запустить локальный Prometheus с подставными значениями.
 -	Создание временных алертов с низким порогом — например, alert при cpu_usage > 1 для имитации срабатывания.
 -	Grafana Alerting — можно протестировать правила прямо в UI через “Test Rule”.
 
 7. Какие есть типы метрик в Prometheus?
-Prometheus поддерживает 4 основных типа метрик:
+Prometheus поддерживает 4 основных типа метрик:  
 - Counter - Нарастающий счетчик (например, количество запросов); нельзя уменьшать
 - Gauge - Значение, которое может увеличиваться и уменьшаться (например, температура, свободная память)
 - Histogram - Разбиение значений по корзинам (например, время ответа запросов); включает сумму и количество
 - Summary - Похож на Histogram, но с квантилями (например, 95-й процентиль времени ответа)
 
 Пример метрики:
-'''http_requests_total{method="GET", handler="/api"} 1234'''
+```
+http_requests_total{method="GET", handler="/api"} 1234
+```
 
 **8. Как избежать перегрузки систем мониторинга?**
 Системы мониторинга могут сами становиться причиной проблем, если не соблюдать баланс между количеством метрик, частотой сбора и сложностью запросов.
