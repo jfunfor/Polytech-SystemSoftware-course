@@ -1,0 +1,9 @@
+- id: core.1
+  status: active
+  priority: 10
+- id: net.12
+  status: inactive
+  priority: 5
+- id: auth.7
+  status: active
+  priority: 8
