@@ -1,0 +1,3 @@
+groups:
+- name: basic_alerts
+  rules: []

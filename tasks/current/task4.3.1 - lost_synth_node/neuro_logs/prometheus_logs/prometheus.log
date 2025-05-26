@@ -1,0 +1,2 @@
+2025-04-19T14:23:01Z level=info msg="Scrape succeeded" target=node-α45.cortex.net job=node_exporter
+2025-04-19T14:24:01Z level=error msg="Scrape failed" target=node-α45.cortex.net error="connection refused"
