@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  client:
+    build: ./client
+    container_name: client
+    networks:
+      net1:
+        ipv4_address: 10.10.10.2
+    cap_add:
+      - NET_ADMIN
+    tty: true
+
+  router1:
+    build: ./router
+    container_name: router1
+    networks:
+      net1:
+        ipv4_address: 10.10.10.1
+      net2:
+        ipv4_address: 10.20.20.1
+    cap_add:
+      - NET_ADMIN
+    tty: true
+
+  router2:
+    build: ./router
+    container_name: router2
+    networks:
+      net2:
+        ipv4_address: 10.20.20.2
+      net3:
+        ipv4_address: 10.30.30.1
+    cap_add:
+      - NET_ADMIN
+    tty: true
+
+  router_batya:
+    build: ./router_batya
+    container_name: router_batya
+    networks:
+      net3:
+        ipv4_address: 10.30.30.2
+      net4:
+        ipv4_address: 10.40.40.1
+    cap_add:
+      - NET_ADMIN
+    tty: true
+
+  gosuslugi:
+    build: ./gosuslugi
+    container_name: gosuslugi
+    networks:
+      net4:
+        ipv4_address: 10.40.40.10
+    cap_add:
+      - NET_ADMIN
+    tty: true
+
+networks:
+  net1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  net2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.20.20.0/24
+  net3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.30.30.0/24
+  net4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.40.40.0/24
