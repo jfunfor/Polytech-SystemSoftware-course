@@ -1,0 +1,3 @@
+# HELP cpu_usage_total Total CPU time
+# TYPE cpu_usage_total counter
+cpu_usage_total 1223.4

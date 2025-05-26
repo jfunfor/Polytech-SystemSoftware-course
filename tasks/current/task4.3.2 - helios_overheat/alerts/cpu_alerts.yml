@@ -1,0 +1,10 @@
+groups:
+- name: cpu_alerts
+  rules:
+  - alert: HighCPU
+    expr: avg(rate(cpu_usage_total[1m])) > 0.9
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"

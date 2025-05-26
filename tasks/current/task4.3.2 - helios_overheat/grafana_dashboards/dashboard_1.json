@@ -1,0 +1,6 @@
+{
+  "panels": [
+    { "id": 1, "targets": [ {"expr": "up"}, {"expr": "cpu"}, {"expr": "mem"}, {"expr": "disk"} ] },
+    { "id": 2, "targets": [ {"expr": "uptime"} ] }
+  ]
+}
