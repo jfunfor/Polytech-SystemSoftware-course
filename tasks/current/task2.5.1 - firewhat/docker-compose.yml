@@ -1,0 +1,44 @@
+version: '3.9'
+
+networks:
+  public_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  private_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.99.0/24
+
+services:
+  firewall:
+    build: .
+    container_name: firewall
+    privileged: true
+    networks:
+      public_net:
+        ipv4_address: 10.10.10.1
+      private_net:
+        ipv4_address: 192.168.99.1
+    volumes:
+      - ./setup.sh:/setup.sh
+      - ./check_firewall.sh:/check_firewall.sh
+    command: sleep infinity
+
+  attacker:
+    image: debian:bookworm
+    container_name: attacker
+    networks:
+      public_net:
+        ipv4_address: 10.10.10.2
+    command: sleep infinity
+
+  drone:
+    image: debian:bookworm
+    container_name: drone
+    networks:
+      private_net:
+        ipv4_address: 192.168.99.10
+    command: sleep infinity
