@@ -1,4 +1,4 @@
-#lchk
+# lchk
 
 A library written in C that allows you to automate and simplify the process of checking assignments for the course "System Software".
 
