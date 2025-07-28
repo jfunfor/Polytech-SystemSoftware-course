@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     lchk_args_t args = {0};
     lchk_parse_args(argc, argv, &args);
 
-    /* 2. Optional: get task token and hmac_secret from file */
+    /* 2. Optional: get task token and hmac secret from file */
     //args.task_token = lchk_read_task_token(LCHK_DEFAULT_TASK_TOKEN_PATH);
     //args.hmac_secret = lchk_read_secret(LCHK_DEFAULT_SECRET_PATH);
 
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     int grade = 100;
     char* feedback = "You are dumb lmao";
 
-    /* 4. Bult response .json file */
+    /* 4. Build response .json file */
     char *json = lchk_build_result_json(&args, grade, feedback);
 
     /* 5. Send response to the frontend */
