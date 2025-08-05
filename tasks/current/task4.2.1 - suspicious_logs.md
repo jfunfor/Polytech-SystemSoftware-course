@@ -19,28 +19,6 @@
 3. Настройте `rsyslog`. Убедитесь, что логи `/var/log/cyberwatch_incidents.log` дублируются на удалённый сервер по адресу `10.0.0.2`, порт 514 UDP.
 4. Перезапустите необходимые сервисы и убедитесь, что всё работает.
 
-## Советы
-
-Для анализа логов за последние 3 дня используйте:
-```
-journalctl -u cyberwatch.service --since "3 days ago"
-```
-
-Для `logrotate` не забудьте создать файл в `/etc/logrotate.d/`.
-
-Для настройки `rsyslog` в `rsyslog.conf` необходимо прописать правило:
-```
-*.*  @10.0.0.2:514
-```
-
-## Цели по теме Логирование
-
-| Тема                        | Применение                            |
-| --------------------------- | ------------------------------------- |
-| Работа с journalctl         | Получение логов о перезапуске сервиса |
-| Ротация логов               | Настройка ротации логов согласно ТЗ   |
-| Централизованный сбор логов | Cбор логов с помощью rsyslog          |
-
 ## Автоматическая проверка 
 
 Обратите внимание на то, что будет проверяться автоматически:
@@ -50,33 +28,3 @@ journalctl -u cyberwatch.service --since "3 days ago"
 3. Конфигурация logrotate.
 4. Наличие сжатых логов.
 5. Настройка rsyslog.
-
-## TODO: разместить отдельно
-
-Сервис `/etc/systemd/system/cyberwatch.service`:
-```
-[Unit]
-Description=Cyberwatch monitoring agent
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/cyberwatch.sh
-Restart=always
-RestartSec=60
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Скрипт `/usr/local/bin/cyberwatch.sh`:
-```
-#!/bin/bash
-
-echo "[`date`] Cyberwatch alert: unusual network activity detected from 10.0.99.13" 
-
-# Симулируем работу: логируем в системный журнал и немного ждём
-sleep 10
-```
-
