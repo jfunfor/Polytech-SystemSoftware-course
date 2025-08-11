@@ -1,3 +1,6 @@
+/* Copyright (c) Dmitry Ivanov, 2025
+ * recp.c - v0.1 - Linux environment setup tool - MIT license */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -555,6 +558,6 @@ int main(int argc, char **argv) {
     }
 
     log_message("Cooking completed successfully", 0);
-    fprintf(stdout, "OK\n");
+    printf("OK\n");
     return 0;
 }
