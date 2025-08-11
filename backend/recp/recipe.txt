@@ -1,0 +1,22 @@
+# Sample Recipe
+
+CREATE_DIR task1/ task1/files uwu
+CREATE_FILE test.txt
+EXEC echo "Hello, World" > test.txt
+COPY test.txt test2.txt
+MOVE test.txt task1/files/test.txt
+DELETE test2.txt uwu some_garbage.md
+
+SCRIPT
+#!/bin/bash
+echo "Hello from bash"
+for i in {1..3}; do
+    echo "iteration $i"
+done
+END_SCRIPT
+
+SCRIPT
+#!/bin/python
+print("Hello from python")
+print(35+34)
+END_SCRIPT
