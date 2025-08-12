@@ -1,32 +1,36 @@
 # === Config ===
+CC = gcc
+CFLAGS = -Wall -Wextra -Wpedantic -O2
+LDFLAGS =
 
-CC      := gcc
-CFLAGS  := -Wall -Wextra -Werror -Iinclude -O2
-LDFLAGS := -lcurl -lcjson -lssl -lcrypto
-SRC_DIR := src
-INC_DIR := include
-OBJ_DIR := build
-BIN_DIR := bin
+# === Project Files ===
+SRCS = main.c logic.c
+OBJS = build/main.o build/logic.o
+HEADERS = lchk.h
+TARGET = lchk
 
-# === Files ===
+# === Installation paths ===
+PREFIX = /usr/local
+BINDIR = $(PREFIX)/bin
 
-TARGET = $(BIN_DIR)/lchk
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SOURCES))
-
-# === Targets ===
+.PHONY: all clean install uninstall
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+$(TARGET): $(OBJS)
+		$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+build/%.o: %.c 
+		@mkdir -p build
+		$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
+		rm -rf build $(TARGET)
 
-.PHONY: all clean
+install: $(TARGET)
+		install -d $(BINDIR)
+		install -m 755 $(TARGET) $(BINDIR)
+
+uninstall:
+		rm -f $(BINDIR)/$(TARGET)
+
