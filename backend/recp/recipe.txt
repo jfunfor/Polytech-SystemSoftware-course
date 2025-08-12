@@ -16,7 +16,7 @@ done
 END_SCRIPT
 
 SCRIPT
-#!/bin/python
+#!/usr/bin/env python3
 print("Hello from python")
 print(35+34)
 END_SCRIPT

@@ -1,5 +1,5 @@
 /* Copyright (c) Dmitry Ivanov, 2025
- * recp.c - v0.1 - Linux environment setup tool - MIT license */
+ * recp.c - v0.2 - Linux environment setup tool - MIT license */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,16 +12,23 @@
 #include <time.h>
 #include <dirent.h>
 #include <sys/wait.h>
+#include <getopt.h>
 
 
 #define RECP_MAX_LINE_LENGTH 4096
 #define RECP_MAX_ARGS 64
-#define RECP_LOG_FILE "recp.log"
+// Provided via global variable
+//#define RECP_LOG_FILE "recp.log"
 #define RECP_TEMP_SCRIPT_FILE "/tmp/recp_script.sh"
 #define RECP_MAX_FILE_SIZE 4096
 #define RECP_INITIAL_SCRIPT_SIZE 1024
 
+
 char recp_msg[256];
+char *recipe_file;
+char *log_file;
+int enable_logging;
+
 
 typedef enum {
     OP_CREATE_DIR,
@@ -42,6 +49,14 @@ typedef struct {
     int arg_count;
 } Command;
 
+// Currently unused
+/*
+typedef struct {
+    char* recipe_file;
+    char* log_file;
+    int enable_logging;
+} Options;
+*/
 
 void log_message(const char *message, int is_error) {
     time_t now;
@@ -49,10 +64,12 @@ void log_message(const char *message, int is_error) {
     char *timestamp = ctime(&now);
     timestamp[strlen(timestamp)-1] = '\0';
 
-    FILE *log = fopen(RECP_LOG_FILE, "a+");
-    if (log) {
-        fprintf(log, "[%s] %s: %s\n", timestamp, is_error ? "ERROR" : "INFO", message);
-        fclose(log);
+    if (enable_logging) {
+        FILE *log = fopen(log_file, "a+");
+        if (log) {
+            fprintf(log, "[%s] %s: %s\n", timestamp, is_error ? "ERROR" : "INFO", message);
+            fclose(log);
+        }
     }
 
     if (is_error) {
@@ -476,6 +493,7 @@ int execute_script(Command *cmd) {
     return 1;
 }
 
+
 int execute_command(Command *cmd) {
     switch (cmd->type) {
         case OP_CREATE_DIR:
@@ -498,7 +516,7 @@ int execute_command(Command *cmd) {
 }
 
 
-int process_recipe(const char* filename) {
+int process_recipe(const char *filename) {
     FILE *recipe_file = fopen(filename, "r");
     if (!recipe_file) {
         snprintf(recp_msg, sizeof(recp_msg), "Could not open recipe file %s: %s",
@@ -544,15 +562,64 @@ int process_recipe(const char* filename) {
 }
 
 
+void usage(const char *progname) {
+    printf("Usage: %s -r <recipe> [options]\n", progname);
+    printf("Options:\n");
+    printf("  -r, --recipe  Recipe file (required)\n");
+    printf("  -l, --log     Save logs to file\n");
+    printf("  -h, -- help   Show this help message\n");
+}
+
+
+void parse_options(int argc, char **argv) {
+
+    static struct option long_options[] = {
+        {"recipe", required_argument, 0, 'r'},
+        {"log", required_argument, 0, 'l'},
+        {"help", no_argument, 0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    int opt;
+    int option_index = 0;
+
+    while ((opt = getopt_long(argc, argv, "r:l:h", long_options, &option_index))) {
+        if (opt == -1) break;
+
+        switch (opt) {
+            case 'r':
+                recipe_file = strdup(optarg);
+                break;
+            case 'l':
+                enable_logging = 1;
+                log_file = strdup(optarg);
+                break;
+            case 'h':
+                usage(argv[0]);
+                exit(0);
+            case '?':
+                usage(argv[0]);
+                exit(1);
+            default:
+                exit(1);
+        }  
+    }
+    if (!recipe_file) {
+        fprintf(stderr, "Recipe file is required\n");
+        usage(argv[0]);
+        exit(1);
+    }
+
+}
+
+
 int main(int argc, char **argv) {
-    // TODO: Usage
     // TODO: Search for recipes
-    (void) argc;
-    (void) argv;
+    parse_options(argc, argv);
 
     log_message("Started cooking", 0);
 
-    if (!process_recipe("recipe.txt")) {
+    if (!process_recipe(recipe_file)) {
         log_message("Cooking completed with errors", 1);
         return 1;
     }
