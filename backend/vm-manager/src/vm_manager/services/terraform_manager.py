@@ -28,7 +28,7 @@ class TerraformManager:
         ssh_password = secrets.token_urlsafe(12)
         for file in ["variables.tf", "provider.tf", "outputs.tf", "secrets.auto.tfvars", "main.tf"]:
             shutil.copy(f"./terraform/{file}", vm_dir)
-        self.generate_cloud_init(vm_dir, "admin", ssh_password)
+        #self.generate_cloud_init(vm_dir, "admin", ssh_password)
 
         # with open("terraform/templates/vm.tf.j2") as f:
         #     main_tf = Template(f.read()).render(
@@ -48,8 +48,10 @@ class TerraformManager:
         tfvars_content = f"""
             vm_name = "{vm_name}"
             cpu_cores = {cpu_cores}
-            memory_gb = {memory_gb}
+            memory_gb = {memory_gb * 1024}
             disk_size_gb = 20
+            vm_user = "admin"
+            vm_password = "{ssh_password}"
             """
         (vm_dir / "terraform.tfvars").write_text(tfvars_content.strip())
 

@@ -1,25 +1,43 @@
-resource "yandex_compute_instance" "vm" {
-  name = var.vm_name
-  platform_id = "standard-v1"
-  zone = var.yc_zone
-  resources {
-    cores  = var.cpu_cores
-    memory = var.memory_gb
+resource "proxmox_vm_qemu" "vm" {
+  name        = var.vm_name
+  target_node   = "proxmox301"
+  clone       = "vm-manager-template"  
+  agent       = 1
+  full_clone  = true
+  scsihw      = "virtio-scsi-pci"
+
+  cores   = var.cpu_cores
+  memory  = var.memory_gb
+
+  disks{
+    ide {
+            ide2 {
+                cloudinit {
+                    storage = "local-lvm"
+                }
+            }
+        }
+    scsi {
+              scsi0 {
+                  disk {
+                      size            = "${var.disk_size_gb}G"
+                      storage         = "local-lvm"
+                      replicate       = true
+                  }
+              }
+          }
   }
 
-  boot_disk {
-    initialize_params {
-      image_id = "fd800c7s2p483i648ifv"  # Ubuntu 20.04
-      size = var.disk_size_gb
-    }
+  network {
+    model  = "virtio"
+    bridge = "vmbr0"
   }
 
-  network_interface {
-    subnet_id = var.yc_subnet_id
-    nat       = true
-  }
+  os_type    = "cloud-init"
+  ciuser     = var.vm_user
+  cipassword = var.vm_password
 
-  metadata = {
-    user-data = file("${path.module}/cloud-init.yml")
-  }
+  ipconfig0  = "ip=dhcp"
+
+  boot = "order=scsi0"
 }
