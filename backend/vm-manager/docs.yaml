@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: VM Service API
+  version: '1.0'
+servers:
+  - url: https://api.example.com
+    description: Production server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /vms/:
+    post:
+      summary: Create a new VM
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: string
+                  example: "1"
+              required:
+                - task_id
+      responses:
+        '201':
+          description: VM successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vm_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  ttyd_url:
+                    type: string
+                    example: "https://somehost/ttyd/550e8400-e29b-41d4-a716-446655440000"
+                  ttyd_user:
+                    type: string
+                    example: "user"
+                  ttyd_password:
+                    type: string
+                    example: "password"
+        '401':
+          description: Unauthorized
+  /vms/{vm_id}/:
+    delete:
+      summary: Delete VM by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: vm_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: VM deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '401':
+          description: Unauthorized
+        '404':
+          description: VM not found
+    get:
+      summary: Get VM details by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: vm_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: VM details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vm_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  task_id:
+                    type: string
+                    example: "1"
+                  time_start:
+                    type: string
+                    format: date-time
+                    example: "2025-08-11T09:15:00Z"
+                  time_end:
+                    type: string
+                    format: date-time
+                    example: "2025-08-11T11:15:00Z"
+                  status:
+                    type: string
+                    description: Current status of the virtual machine
+                    enum:
+                      - "running"
+                      - "deleted by request"
+                      - "deleted by timer"
+                    example: "running"
+        '401':
+          description: Unauthorized
+        '404':
+          description: VM not found
+  /vms/check_task/:
+    post:
+      summary: Get task result for VM
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vm_id:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+              required:
+                - vm_id
+      responses:
+        '200':
+          description: Task check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+                    example: "1"
+                  grade:
+                    type: integer
+                    example: 75
+                  feedback:
+                    type: array
+                    items:
+                      type: string
+                    example: ["feedback1", "feed2", "uwu"]
+        '401':
+          description: Unauthorized
+security:
+  - bearerAuth: []
