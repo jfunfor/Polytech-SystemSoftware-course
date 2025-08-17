@@ -44,7 +44,7 @@
 Файловая структура задания
 
 ```
-/home/student/task1.4.1/  
+/home/student/textproc-1/  
 ├── virus_tf.log             # исходный файл
 └── filtered_logs.txt        # выходной файл (решение)
 ```
