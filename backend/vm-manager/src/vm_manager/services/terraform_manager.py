@@ -20,8 +20,9 @@ class TerraformManager:
             )
         (vm_dir / "cloud-init.yml").write_text(cloud_init)
 
-    def create_vm(self, vm_name: str, cpu_cores: int, memory_gb: int):
+    def create_vm(self, cpu_cores: int, memory_gb: int, disk_size: int):
         vm_id = str(uuid.uuid4())
+        vm_name = str(vm_id).replace("-", "")
         vm_dir = Path(f"./terraform/generated/{vm_id}")
         vm_dir.mkdir(parents=True, exist_ok=True)
 
@@ -49,7 +50,7 @@ class TerraformManager:
             vm_name = "{vm_name}"
             cpu_cores = {cpu_cores}
             memory_gb = {memory_gb * 1024}
-            disk_size_gb = 20
+            disk_size_gb = {disk_size}
             vm_user = "admin"
             vm_password = "{ssh_password}"
             """
@@ -90,6 +91,7 @@ class TerraformManager:
 
         return {
             "vm_id": vm_id,
+            "vm_name": vm_name,
             "ssh_password": ssh_password,
             "ssh_user": "admin",
             "ip_addres": ip_addres

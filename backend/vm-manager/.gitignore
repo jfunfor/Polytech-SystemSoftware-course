@@ -71,3 +71,4 @@ htmlcov/
 
 #terraform
 secrets.auto.tfvars
+generated/
