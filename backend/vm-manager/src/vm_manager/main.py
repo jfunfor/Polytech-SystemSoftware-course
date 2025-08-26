@@ -1,9 +1,5 @@
 from fastapi import FastAPI
-from .api.endpoints import router as vm_router
+from .api.endpoints import router, lifespan
 
-app = FastAPI(
-    title="VM Manager API",
-    description="Управление виртуальными машинами в Proxmox"
-)
-
-app.include_router(vm_router)
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)

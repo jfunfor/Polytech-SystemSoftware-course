@@ -1,6 +1,14 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import (
+    FastAPI,
+    APIRouter,
+    Depends,
+    HTTPException,
+    BackgroundTasks,
+    status
+)
+from sqlalchemy import func
+import asyncio
+import contextlib
 import json
 from ..schemas import (
     VMCreateRequest,
@@ -13,6 +21,10 @@ from ..schemas import (
 )
 from ..services.terraform_manager import TerraformManager
 from ..services.vm_connection import RemoteDeployer
+from ..services.vm_timer import(
+    set_redis_ttl_for_vm,
+    vm_cleanup_worker
+)
 from ..db import get_db
 from ..models import VM
 
@@ -20,15 +32,28 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-from src.vm_manager.models import Base
+from vm_manager.models import Base
 
 load_dotenv(Path(__file__).parent.parent / '.env')
 
 router = APIRouter()
 tf_manager = TerraformManager()
 
+
 @router.post("/vms/", response_model=VMCreateResponse)
-def create_vm(request: VMCreateRequest, db = Depends(get_db)):
+async def create_vm(
+    request: VMCreateRequest,
+    background_tasks: BackgroundTasks,
+    db = Depends(get_db),
+):
+    running_vms_count = db.query(func.count(VM.id)).filter(VM.status == VMStatus.RUNNING).scalar()
+
+    if running_vms_count >= 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Превышено максимальное количество активных VM (10). Попробуйте позже."
+        )
+
     result = tf_manager.create_vm(
         cpu_cores=request.cpu_cores,
         memory_gb=request.memory_gb,
@@ -49,6 +74,8 @@ def create_vm(request: VMCreateRequest, db = Depends(get_db)):
 
     db.add(vm)
     db.commit()
+
+    background_tasks.add_task(set_redis_ttl_for_vm, vm.id)
 
     conn = RemoteDeployer(
         vm.ip_addres,
@@ -127,3 +154,11 @@ def check_task(request: CheckTaskRequest, db = Depends(get_db)):
         grade=data['grade'],
         feedback=data.get('feedback', [])
     )
+
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    cleanup_task = asyncio.create_task(vm_cleanup_worker(tf_manager))
+    yield
+    cleanup_task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await cleanup_task
