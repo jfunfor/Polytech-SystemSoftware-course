@@ -1,7 +1,7 @@
 resource "proxmox_vm_qemu" "vm" {
   name        = var.vm_name
   target_node   = "proxmox301"
-  clone       = "vm-manager-template"  
+  clone       = "vm-manager-template-main"  
   agent       = 1
   full_clone  = true
   scsihw      = "virtio-scsi-pci"

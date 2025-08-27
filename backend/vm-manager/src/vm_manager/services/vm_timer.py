@@ -17,6 +17,7 @@ async_redis_client = redis.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", "6379")),
     db=0,
+    password=os.getenv("REDIS_PASS"),
     decode_responses=True,
 )
 
@@ -25,6 +26,7 @@ sync_redis_client = redis_sync.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", "6379")),
     db=0,
+    password=os.getenv("REDIS_PASS", "localhost"),
     decode_responses=True,
 )
 
@@ -88,3 +90,67 @@ def set_redis_ttl_for_vm(vm_id: str):
         print(f"Установка ключа в Redis для VM {vm_id}: {result}", flush=True)
     except Exception as e:
         print(f"Ошибка при установке TTL для VM {vm_id}: {e}", flush=True)
+
+async def delete_redis_key(vm_id: str):
+    """
+    Удаление ключа VM из Redis при ручном удалении
+    """
+    try:
+        # Удаляем ключ из Redis
+        result = await async_redis_client.delete(vm_id)
+        print(f"Ключ VM {vm_id} удален из Redis: {result}", flush=True)
+        return result
+    except Exception as e:
+        print(f"Ошибка при удалении ключа {vm_id} из Redis: {e}", flush=True)
+        raise
+
+def delete_redis_key_sync(vm_id: str):
+    """
+    Синхронная версия для использования в фоновых задачах
+    """
+    try:
+        result = sync_redis_client.delete(vm_id)
+        print(f"Ключ VM {vm_id} удален из Redis (sync): {result}", flush=True)
+        return result
+    except Exception as e:
+        print(f"Ошибка при удалении ключа {vm_id} из Redis (sync): {e}", flush=True)
+        raise
+
+async def extend_redis_ttl(vm_id: str):
+    """
+    Продление TTL ключа VM в Redis при активности пользователя
+    Если ключа нет - ничего не делаем
+    """
+    try:
+        # Проверяем существует ли ключ
+        exists = await async_redis_client.exists(vm_id)
+        if exists:
+            # Продлеваем TTL на стандартное время
+            result = await async_redis_client.expire(vm_id, VM_TTL_SECONDS)
+            print(f"TTL для VM {vm_id} продлен: {result}", flush=True)
+            return result
+        else:
+            # Если ключа нет, просто выводим сообщение и ничего не делаем
+            print(f"Ключ для VM {vm_id} не найден в Redis, продление не требуется", flush=True)
+            return False
+    except Exception as e:
+        print(f"Ошибка при продлении TTL для VM {vm_id}: {e}", flush=True)
+        raise
+
+def extend_redis_ttl_sync(vm_id: str):
+    """
+    Синхронная версия для продления TTL
+    Если ключа нет - ничего не делаем
+    """
+    try:
+        exists = sync_redis_client.exists(vm_id)
+        if exists:
+            result = sync_redis_client.expire(vm_id, VM_TTL_SECONDS)
+            print(f"TTL для VM {vm_id} продлен (sync): {result}", flush=True)
+            return result
+        else:
+            print(f"Ключ для VM {vm_id} не найден в Redis (sync), продление не требуется", flush=True)
+            return False
+    except Exception as e:
+        print(f"Ошибка при продлении TTL для VM {vm_id} (sync): {e}", flush=True)
+        raise

@@ -23,7 +23,9 @@ from ..services.terraform_manager import TerraformManager
 from ..services.vm_connection import RemoteDeployer
 from ..services.vm_timer import(
     set_redis_ttl_for_vm,
-    vm_cleanup_worker
+    vm_cleanup_worker,
+    delete_redis_key,
+    extend_redis_ttl
 )
 from ..db import get_db
 from ..models import VM
@@ -32,7 +34,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-from vm_manager.models import Base
+from src.vm_manager.models import Base
 
 load_dotenv(Path(__file__).parent.parent / '.env')
 
@@ -85,7 +87,7 @@ async def create_vm(
 
     conn.add_ed25519_private_key(os.getenv("SSH_PRIVATE_KEY"))
 
-    conn.install_build_essential()
+    #conn.install_build_essential()
     conn.clone_recipe_repo(os.getenv("RECIPE_REPO_URL"))
     conn.build_executable('make', 'Polytech-SystemSoftware-course/backend/recp')
     conn.run_executable('recp', work_dir='Polytech-SystemSoftware-course/backend/recp')
@@ -106,7 +108,7 @@ async def create_vm(
     
 
 @router.delete("/vms/{vm_id}/", response_model=VMDestroyResponse)
-def destroy_vm(vm_id: str, db=Depends(get_db)):
+async def destroy_vm(vm_id: str, db=Depends(get_db)):
     
     vm = db.get(VM, vm_id)
     if not vm:
@@ -114,6 +116,7 @@ def destroy_vm(vm_id: str, db=Depends(get_db)):
     
     try:
         tf_manager.delete_vm(vm_id)
+        await delete_redis_key(vm_id)
     except Exception as e:
         return(VMDestroyResponse(success=False))
 
@@ -123,11 +126,15 @@ def destroy_vm(vm_id: str, db=Depends(get_db)):
     return(VMDestroyResponse(success=True))
 
 @router.post("/vms/check_task/", response_model=CheckTaskResponse)
-def check_task(request: CheckTaskRequest, db = Depends(get_db)):
+async def check_task(request: CheckTaskRequest, db = Depends(get_db)):
     vm = db.get(VM, request.vm_id)
     if not vm:
         raise HTTPException(status_code=404, detail="VM не найдена") 
 
+    if vm.status != VMStatus.RUNNING:
+        raise HTTPException(status_code=400, detail="VM отключена") 
+
+    await extend_redis_ttl(request.vm_id)
 
     conn = RemoteDeployer(
         vm.ip_addres,
