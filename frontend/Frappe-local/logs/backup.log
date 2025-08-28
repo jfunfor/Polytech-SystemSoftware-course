@@ -1,0 +1,354 @@
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250818_203002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-18 20:30:03.700594
+Config  : ./learninglinux.test/private/backups/20250818_203002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250818_203002-learninglinux_test-database.sql.gz         276.5KiB
+Backup for Site learninglinux.test has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250818_203003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-18 20:30:05.510805
+Config  : ./site1.local/private/backups/20250818_203003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250818_203003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250819_023002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-19 02:30:04.476606
+Config  : ./learninglinux.test/private/backups/20250819_023002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250819_023002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250818_203003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250818_203003-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250819_023004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-19 02:30:06.417336
+Config  : ./site1.local/private/backups/20250819_023004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250819_023004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250819_083002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-19 08:30:03.986089
+Config  : ./learninglinux.test/private/backups/20250819_083002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250819_083002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250819_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250819_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250818_203003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250818_203003-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250819_083003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-19 08:30:05.427177
+Config  : ./site1.local/private/backups/20250819_083003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250819_083003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250820_023005-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-20 02:30:07.079888
+Config  : ./learninglinux.test/private/backups/20250820_023005-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250820_023005-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250819_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250819_023004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250819_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250819_023004-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250818_203003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250818_203003-site1_local-database.sql.gz is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-20 02:30:12.570798
+Config  : ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250820_083002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-20 08:30:03.366467
+Config  : ./learninglinux.test/private/backups/20250820_083002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250820_083002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250819_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250819_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-20 08:30:04.690254
+Config  : ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250820_143002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-20 14:30:03.249856
+Config  : ./learninglinux.test/private/backups/20250820_143002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250820_143002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250819_083003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250819_083003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-20 14:30:04.532133
+Config  : ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250820_203003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-20 20:30:04.164571
+Config  : ./learninglinux.test/private/backups/20250820_203003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250820_203003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-20 20:30:05.507290
+Config  : ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250821_023003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-21 02:30:04.459659
+Config  : ./learninglinux.test/private/backups/20250821_023003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250821_023003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-21 02:30:05.795974
+Config  : ./site1.local/private/backups/20250821_023004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250821_083002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-21 08:30:03.523737
+Config  : ./learninglinux.test/private/backups/20250821_083002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250821_083002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250821_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_023007-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250821_083003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-21 08:30:05.012640
+Config  : ./site1.local/private/backups/20250821_083003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250821_083003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250821_143002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-21 14:30:04.170724
+Config  : ./learninglinux.test/private/backups/20250821_143002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250821_143002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250821_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250821_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_083003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250821_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250821_143004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-21 14:30:05.867254
+Config  : ./site1.local/private/backups/20250821_143004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250821_143004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250821_203003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-21 20:30:04.861882
+Config  : ./learninglinux.test/private/backups/20250821_203003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250821_203003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250821_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250821_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250821_143004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250821_143004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250821_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250820_143003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250820_143003-site1_local-site_config_backup.json is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250821_203005-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-21 20:30:06.511823
+Config  : ./site1.local/private/backups/20250821_203005-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250821_203005-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250823_203005-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-23 20:30:07.080389
+Config  : ./learninglinux.test/private/backups/20250823_203005-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250823_203005-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250821_083003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250820_203004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250821_083003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250821_143004-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250820_203004-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250821_023004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250821_143004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250821_203005-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250821_203005-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250821_023004-site1_local-site_config_backup.json is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-23 20:30:08.946575
+Config  : ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250824_023002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-24 02:30:03.799468
+Config  : ./learninglinux.test/private/backups/20250824_023002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250824_023002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-24 02:30:05.095546
+Config  : ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250824_083002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-24 08:30:03.681217
+Config  : ./learninglinux.test/private/backups/20250824_083002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250824_083002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-24 08:30:04.998397
+Config  : ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250824_143002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-24 14:30:03.610115
+Config  : ./learninglinux.test/private/backups/20250824_143002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250824_143002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-24 14:30:05.533374
+Config  : ./site1.local/private/backups/20250824_143003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250824_203003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-24 20:30:04.176616
+Config  : ./learninglinux.test/private/backups/20250824_203003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250824_203003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_143003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz is recent
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250824_203004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-24 20:30:05.536016
+Config  : ./site1.local/private/backups/20250824_203004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250824_203004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250825_023003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-25 02:30:04.605749
+Config  : ./learninglinux.test/private/backups/20250825_023003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250825_023003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_143003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250823_203007-site1_local-database.sql.gz is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250825_023004-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-25 02:30:06.001554
+Config  : ./site1.local/private/backups/20250825_023004-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250825_023004-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250825_083002-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-25 08:30:03.661913
+Config  : ./learninglinux.test/private/backups/20250825_083002-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250825_083002-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250825_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250825_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_203004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_143003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_203004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_023004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250824_023004-site1_local-site_config_backup.json is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250825_083003-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-25 08:30:05.045017
+Config  : ./site1.local/private/backups/20250825_083003-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250825_083003-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed
+set -o pipefail; /usr/bin/mariadb-dump --user=_a5bfa8d5e9333f5c --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _a5bfa8d5e9333f5c | /usr/bin/gzip >> ./learninglinux.test/private/backups/20250825_203003-learninglinux_test-database.sql.gz
+
+Backup Summary for learninglinux.test at 2025-08-25 20:30:05.595114
+Config  : ./learninglinux.test/private/backups/20250825_203003-learninglinux_test-site_config_backup.json 94.0B
+Database: ./learninglinux.test/private/backups/20250825_203003-learninglinux_test-database.sql.gz         277.6KiB
+Backup for Site learninglinux.test has been successfully completed
+File ./site1.local/private/backups/20250824_143003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250825_083003-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250825_023004-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250825_023004-site1_local-site_config_backup.json is recent
+File ./site1.local/private/backups/20250824_083003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250824_203004-site1_local-database.sql.gz is older than 24 hours
+File ./site1.local/private/backups/20250824_143003-site1_local-site_config_backup.json is older than 24 hours
+File ./site1.local/private/backups/20250825_083003-site1_local-database.sql.gz is recent
+File ./site1.local/private/backups/20250824_203004-site1_local-site_config_backup.json is older than 24 hours
+set -o pipefail; /usr/bin/mariadb-dump --user=_11d282e25973086f --host=127.0.0.1 --port=3306 --password=********** --single-transaction --quick --lock-tables=false _11d282e25973086f | /usr/bin/gzip >> ./site1.local/private/backups/20250825_203005-site1_local-database.sql.gz
+
+Backup Summary for site1.local at 2025-08-25 20:30:07.723308
+Config  : ./site1.local/private/backups/20250825_203005-site1_local-site_config_backup.json 94.0B
+Database: ./site1.local/private/backups/20250825_203005-site1_local-database.sql.gz         281.2KiB
+Backup for Site site1.local has been successfully completed

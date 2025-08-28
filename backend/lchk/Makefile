@@ -34,4 +34,3 @@ install: $(TARGET)
 
 uninstall:
 		rm -f $(BINDIR)/$(TARGET)
-
