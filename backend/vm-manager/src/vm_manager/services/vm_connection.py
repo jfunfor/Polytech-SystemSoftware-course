@@ -59,7 +59,7 @@ class RemoteDeployer:
         return self.execute_command(cmd)
     
     def run_executable(self, exec_path, args='', work_dir=None):
-        cmd_line = f"./{exec_path} {args}".strip()
+        cmd_line = f"sudo ./{exec_path} {args}".strip()
         if work_dir is not None:
             cmd = f"cd {work_dir} && {cmd_line}"
         else:
