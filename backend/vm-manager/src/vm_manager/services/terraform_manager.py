@@ -51,7 +51,7 @@ class TerraformManager:
             cpu_cores = {cpu_cores}
             memory_gb = {memory_gb * 1024}
             disk_size_gb = {disk_size}
-            vm_user = "admin"
+            vm_user = "student"
             vm_password = "{ssh_password}"
             """
         (vm_dir / "terraform.tfvars").write_text(tfvars_content.strip())
@@ -93,7 +93,7 @@ class TerraformManager:
             "vm_id": vm_id,
             "vm_name": vm_name,
             "ssh_password": ssh_password,
-            "ssh_user": "admin",
+            "ssh_user": "student",
             "ip_addres": ip_addres
         }
     

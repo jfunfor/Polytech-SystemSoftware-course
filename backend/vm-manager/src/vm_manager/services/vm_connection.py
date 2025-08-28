@@ -42,9 +42,9 @@ class RemoteDeployer:
 
     def clone_recipe_repo(self, repo_url, dest_dir=None):
         if dest_dir is not None:
-            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone {repo_url} {dest_dir}"
+            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone -b develop {repo_url} {dest_dir}"
         else:
-            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone {repo_url}"
+            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone -b develop {repo_url}"
         return self.execute_command(cmd)
     
     def delete_recipe_repo(self, dir):
