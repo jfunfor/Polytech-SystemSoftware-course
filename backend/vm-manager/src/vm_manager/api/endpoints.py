@@ -158,10 +158,10 @@ async def check_task(request: CheckTaskRequest, db = Depends(get_db)):
     conn.close()
 
     try:
-        data = json.load(output)
+        data = json.loads(output)
     except Exception as e:
-        print(output, flush=True)
-        print(err, flush=True)
+        print(output)
+        #print(err, flush=True)
         raise HTTPException(status_code=500, detail="Ошибка чтения результатов автопроверки") 
 
     return CheckTaskResponse(
