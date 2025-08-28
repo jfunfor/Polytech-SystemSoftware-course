@@ -1,7 +1,7 @@
 # === Config ===
 CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -O2
-DEFINES =# -DHOME=\"/home/student/\" -Dsystemd_1__COWSAY_PATH=\"/usr/games/cowsay\" 
+DEFINES = -DHOME=\"/home/student/\" -Dsystemd_1__COWSAY_PATH=\"/usr/games/cowsay\" 
 LDFLAGS =
 
 # === Project Files ===

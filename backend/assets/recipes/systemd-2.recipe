@@ -1,0 +1,32 @@
+# Recipe for task 'systemd-2' ('task1.9.2')
+# v.0.1 -- 17.08.2025
+
+# Base directory for the task
+#CREATE_DIR /home/flopp/task1.9.2/
+CREATE_DIR /home/student/task1.9.2/
+
+# Script for creating script file for the task
+SCRIPT
+#!/bin/bash
+#TASK_FILE="/home/flopp/task1.9.2/cerberus-log.sh"
+TASK_FILE="/home/student/task1.9.2/cerberus-log.sh"
+
+cat > "$TASK_FILE" << 'EOF'
+#!/bin/bash
+# cerberus-log.sh - Simple telemetry logging script
+
+LOG_TAG="cerberus"
+INTERVAL=5
+
+while true; do
+    # Log system information with cerberus tag
+    echo "Cerberus telemetry active - $(date)" | systemd-cat -t "$LOG_TAG"
+    echo "Hostname: $(hostname)" | systemd-cat -t "$LOG_TAG"
+    echo "Uptime: $(uptime)" | systemd-cat -t "$LOG_TAG"
+    
+    # Wait before next iteration
+    sleep $INTERVAL
+done
+EOF
+
+END_SCRIPT

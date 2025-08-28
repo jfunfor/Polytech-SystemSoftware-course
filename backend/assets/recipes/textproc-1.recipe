@@ -1,0 +1,95 @@
+# Recipe for task 'textproc-1' ('task1.4.1')
+# v.0.1 -- 17.08.2025
+
+# TODO: Make backup file in /var/tmp/
+# TODO: Calculate SHA-1 and store it in /var/tmp/ as well
+
+# Base directory for the task
+#CREATE_DIR /home/flopp/task1.4.1/
+CREATE_DIR /home/student/task1.4.1/
+
+# Script for creating random logs
+SCRIPT
+#!/usr/bin/python3
+import os
+import random
+import sys
+from datetime import datetime, timedelta
+
+logs_dir = "/usr/share/course/logs-template/"
+#home_dir = "/home/flopp/"
+home_dir = "/home/student/"
+task_dir = "task1.4.1/"
+
+def parse_selected_log_file(filepath):
+    """Parse the selected log file and return its content and line count."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            lines = [line.strip() for line in f.readlines() if line.strip()]
+            return lines
+    except IOError as e:
+        raise IOError(f"Error reading {filepath}: {e}")
+
+def generate_log_entry(base_time, delta_seconds, message):
+    """Generate a log entry with the required format."""
+    levels = ['INFO', 'DEBUG', 'WARN', 'ERROR']
+    modules = ['AUTH', 'CORE', 'NET', 'SYS']
+
+    log_time = (base_time + timedelta(seconds=delta_seconds)).strftime('%H:%M:%S')
+    level = random.choice(levels)
+    module = random.choice(modules)
+
+    return f"[{level}] [{module}] [{log_time}] {message}"
+
+def main():
+    # Configuration
+    num_entries = 1000
+    log_files = [f"{logs_dir}log{i}.txt" for i in range(1, 7)]
+    output_file = f"{home_dir}{task_dir}black_archive.log"
+
+    # Verify at least one log file exists
+    if not any(os.path.isfile(f) for f in log_files):
+        raise FileNotFoundError("No log files found in the directory")
+
+    # Select a random file that exists
+    selected_file = None
+    random.shuffle(log_files)
+    for f in log_files:
+        if os.path.isfile(f):
+            selected_file = f
+            break
+
+    if not selected_file:
+        raise FileNotFoundError("No valid log files found")
+
+    # Parse only the selected file
+    try:
+        lines = parse_selected_log_file(selected_file)
+    except Exception as e:
+        raise RuntimeError(f"Error processing {selected_file}: {e}")
+
+    # Check if we have enough lines
+    max_start = len(lines) - num_entries
+    if max_start < 0:
+        raise ValueError(f"File {selected_file} has only {len(lines)} lines, but {num_entries} requested")
+
+    # Select a random starting position
+    start_pos = random.randint(0, max_start)
+    selected_lines = lines[start_pos:start_pos + num_entries]
+
+    # Generate the output log
+    base_time = datetime.now()
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for i, line in enumerate(selected_lines):
+            log_entry = generate_log_entry(base_time, i, line)
+            f.write(log_entry + '\n')
+
+    print(f"Successfully generated {output_file} with {num_entries} entries from {selected_file}")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+END_SCRIPT

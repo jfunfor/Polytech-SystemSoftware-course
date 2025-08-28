@@ -1,0 +1,76 @@
+# Recipe for task 'textproc-2' ('task1.4.2')
+# v.0.1 -- 17.08.2025
+
+# TODO: Make backup files in /var/tmp/
+# TODO: Calculate SHA-1 and store it in /var/tmp/ as well
+
+# Base directory for the task
+#CREATE_DIR /home/flopp/task1.4.2/
+CREATE_DIR /home/student/task1.4.2/
+
+# Script for creating random logs
+SCRIPT
+#!/usr/bin/python3
+import random
+import json
+import yaml
+
+#home_dir = "/home/flopp/"
+home_dir = "/home/student/"
+task_dir = "task1.4.2/"
+
+def generate_entries(count=1000):
+    """Generate random manifest entries."""
+    modules = ['core', 'net', 'auth', 'sys']
+    statuses = ['active', 'inactive']
+    priorities = random.sample(range(1, 1001), count)
+    entries = []
+    for i in range(count):
+        module = random.choice(modules)
+        number = random.randint(1, 100)
+        entry = {
+            'id': f"{module}.{number}",
+            'status': random.choice(statuses),
+            'priority': priorities[i]
+        }
+        entries.append(entry)
+    return entries
+
+def write_json_file(entries, filename=f'{home_dir}{task_dir}manifest.json'):
+    """Write entries to JSON file."""
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(entries, f, indent=2)
+
+def write_yaml_file(entries, filename=f'{home_dir}{task_dir}manifest.yaml'):
+    """Write entries to YAML file."""
+    yaml_entries = []
+    for entry in entries:
+        yaml_entries.append({
+            'id': entry['id'],
+            'status': entry['status'],
+            'priority': entry['priority']
+        })
+    with open(filename, 'w', encoding='utf-8') as f:
+        yaml.dump(yaml_entries, f, default_flow_style=False, sort_keys=False)
+
+def main():
+    try:
+        # Generate 1000 random entries
+        entries = generate_entries(1000)
+        
+        # Write JSON file
+        write_json_file(entries)
+        print("Successfully generated manifest.json")
+        
+        # Write YAML file
+        write_yaml_file(entries)
+        print("Successfully generated manifest.yaml")
+        
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    import sys
+    main()
+END_SCRIPT
