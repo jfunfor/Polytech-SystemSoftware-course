@@ -1666,6 +1666,13 @@ bool bash_1__main(Lchk_Options *options, Lchk_Result *result, void *config) {
     UNUSED(options); UNUSED(config);
     srand(time(NULL));
 
+    // Check if 'log_analyzer.sh' file exists
+    if (!general__file_exists(bash_1__PATH"log_analyzer.sh")) {
+        lchk_add_feedback(result, "Fail: Script "bash_1__PATH"log_analyzer.sh does not exist");
+        lchk_set_grade(result, 0);
+        return false;
+    }
+
     // Create log data and generate random logs
     bash_1__Log_Data log_data = bash_1__create_log_data();
     // Generating from 5 to MAX_ENTRIES entries
