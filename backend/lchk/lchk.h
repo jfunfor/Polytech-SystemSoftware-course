@@ -1,10 +1,11 @@
 /* Copyright (c) Dmitry Ivanov, 2025
- * lchk.h - v0.1 - Linux assignment checking framework - MIT license */
+ * lchk.h - v0.2 - Linux assignment checking framework - MIT license */
 
 #ifndef LCHK_H
 #define LCHK_H
 
-#include <inttypes.h>
+#include <stdint.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <time.h>
+#include <sys/stat.h>
 
 
 #define LCHK_MAX_FEEDBACK_ITEMS 20
@@ -33,6 +35,8 @@ File_Content read_file_content(const char *path);
 
 void free_file_content(File_Content *fc);
 
+bool find_diff_in_files(const char *sus, const char *cpy, const char *sha1);
+
 
 #define PGM_MAX_HEIGHT 1024 
 #define PGM_MAX_WIDTH 1024
@@ -51,15 +55,18 @@ void convert_pgm_to_ascii(unsigned char image[PGM_MAX_HEIGHT][PGM_MAX_WIDTH],
     } while (0)
 
 
-#define lchk_add_feedback(result, string)                               \
+#define lchk_add_feedback(result, format, ...)                          \
     do {                                                                \
         if ((result)->feedback_count < LCHK_MAX_FEEDBACK_ITEMS) {       \
             snprintf((result)->feedback[(result)->feedback_count],      \
-                    LCHK_MAX_FEEDBACK_LENGTH, string);                  \
+                    LCHK_MAX_FEEDBACK_LENGTH, format, ##__VA_ARGS__);   \
             (result)->feedback_count++;                                 \
         }                                                               \
     } while (0)
 
+#define lchk_feedback_empty(result) ((result)->feedback_count == 0)
+
+#define lchk_set_grade(result, value) ((result)->grade = value)
 
 typedef enum {
     LCHK_SEARCH_BY_NAME,
@@ -138,7 +145,7 @@ void lchk_list_modules(void);
  #define LCHK_REGISTER_MODULE_FULL(name, t_id, desc, ver, ch_f, cr_c, fr_c, en) \
     static Lchk_Module name##_module = {                                        \
         .info = {#name, t_id, desc, ver, en},                                   \
-        .check = ch_f,                                                         \
+        .check = ch_f,                                                          \
         .create_config = cr_c,                                                  \
         .free_config = fr_c                                                     \
     };                                                                          \
@@ -201,7 +208,7 @@ static inline void lchk_list_func(void) {
     }
 }
 
-#endif /* LCHK_H */
+#endif // LCHK_H
 
 
 
@@ -310,13 +317,13 @@ bool lchk_run_module(Lchk_Options *options, Lchk_Result *result, const char *ide
         return false;
     }
 
-    /* Callback for creating config if set */
+    // Callback for creating config if set
     void *config = module->create_config ? module->create_config() : NULL;
     
-    /* Perform main logic */
+    // Perform main logic
     bool success = module->check(options, result, config);
     
-    /* Callback for freeing config if set */
+    // Callback for freeing config if set
     if (module->free_config && config) module->free_config(config);
 
     return success;
@@ -427,6 +434,77 @@ void free_file_content(File_Content *fc) {
 }
 
 
+static bool hex_to_bin(const char *hex, uint8_t *bin, size_t bin_len) {
+    if (strlen(hex) != bin_len * 2) {
+        return false;
+    }
+    for (size_t i = 0; i < bin_len; ++i) {
+        if (sscanf(hex + 2*i, "%02hhx", &bin[i]) != 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool parse_sha1sum_file(const char *sha1, uint8_t *digest) {
+    FILE *file = fopen(sha1, "r");
+    if (!file) {
+        // TODO: Remove yapping.
+        fprintf(stderr, "Could not open file: %s\n", sha1);
+        return false;
+    }
+
+    char hex[41] = {0};
+    if (fscanf(file, "%40s", hex) != 1) {
+        fclose(file);
+        fprintf(stderr, "Could not read SHA-1 from file: %s\n", sha1);
+        return false;
+    }
+    fclose(file);
+
+    return hex_to_bin(hex, digest, 20);
+}
+
+
+#define TEENY_SHA1_IMPLEMENTATION
+#include "./thirdparty/teenysha1.h"
+
+bool find_diff_in_files(const char *sus, const char *cpy, const char *sha1) {
+    File_Content fc_sus = read_file_content(sus);
+    File_Content fc_cpy = read_file_content(cpy);
+    
+    // Compare number of bytes in sus and cpy files
+    if (fc_sus.length != fc_cpy.length) {
+        goto fail;
+    }
+    
+    // Calculate sha1sum of sus file
+    SHA1 s = {0};
+    sha1_reset(&s);
+    sha1_process_bytes(&s, fc_sus.data, fc_sus.length);
+    digest8_t mem_digest;
+    sha1_get_digest_bytes(&s, mem_digest);
+
+    // Parse sha1sum from backup file
+    uint8_t file_digest[20];
+    if (!parse_sha1sum_file(sha1, file_digest)) {
+        goto fail;
+    }
+
+    // Compare digests
+    if (memcmp(mem_digest, file_digest, 20) == 0) {
+        free_file_content(&fc_sus);
+        free_file_content(&fc_cpy);
+        return true;
+    }
+
+fail:
+    free_file_content(&fc_sus);
+    free_file_content(&fc_cpy);
+    return false;
+}
+
+
 bool read_pgm_image(const char *path, unsigned char image[PGM_MAX_HEIGHT][PGM_MAX_WIDTH],
         int *width, int *height, int *max_val) {
     FILE *file = fopen(path, "rb");
@@ -448,10 +526,10 @@ bool read_pgm_image(const char *path, unsigned char image[PGM_MAX_HEIGHT][PGM_MA
         return false;
     }
 
-    /* Skip whitespace after header */
+    // Skip whitespace after header
     fgetc(file);
 
-    /* Read pixel data */
+    // Read pixel data
     for (int y = 0; y < *height; ++y) {
         for (int x = 0; x < *width; ++x) {
             int pixel = fgetc(file);
@@ -510,7 +588,7 @@ static void usage(const char *progname) {
 void lchk_parse_options(Lchk_Options *options, int argc, char **argv) {
     options->enable_logging = false;
     options->enable_feedback = false;
-    /* Auto search by default */
+    // Auto search by default
     options->search_mode = LCHK_SEARCH_AUTO;
 
     static struct option long_options[] = {
@@ -548,7 +626,7 @@ void lchk_parse_options(Lchk_Options *options, int argc, char **argv) {
                 usage(argv[0]);
                 exit(1);
             default:
-                /* In theory, we should never get here */
+                // In theory, we should never get here
                 exit(1);
         }
     }
@@ -587,10 +665,10 @@ char *lchk_generate_json(Lchk_Options *options, Lchk_Result *result) {
     // static char json[LCHK_MAX_OUTPUT_LENGTH];
     memcpy(json, jim.sink, jim.sink_count);
     json[jim.sink_count] = '\0';
-    /* Free allocated memory in serializer */
+    // Free allocated memory in serializer
     free(jim.sink);
     free(jim.scopes);
-    /* Caller should free */
+    // Caller should free
     return json;
 }
 
@@ -605,4 +683,4 @@ void lchk_generate_and_print_json(Lchk_Options *options, Lchk_Result *result, FI
 }
 
 
-#endif /* LCHK_IMPLEMENTATION */
+#endif // LCHK_IMPLEMENTATION

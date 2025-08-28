@@ -3,6 +3,11 @@
 
 int main(int argc, char **argv) {
 
+    // EXAPMLE: Finding data corruption.
+    /*
+    find_diff_in_files("main.c", "main.c", "sha.txt");
+    */
+
     // EXAMPLE: Reading files.
     /* 
     File_Content content = read_file_content("main.c");

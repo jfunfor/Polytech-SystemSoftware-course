@@ -1,6 +1,7 @@
 # === Config ===
 CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -O2
+DEFINES =# -DHOME=\"/home/student/\" -Dsystemd_1__COWSAY_PATH=\"/usr/games/cowsay\" 
 LDFLAGS =
 
 # === Project Files ===
@@ -22,7 +23,7 @@ $(TARGET): $(OBJS)
 
 build/%.o: %.c 
 		@mkdir -p build
-		$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) $(DEFINES) -c $< -o $@
 
 clean:
 		rm -rf build $(TARGET)
