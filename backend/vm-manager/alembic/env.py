@@ -11,7 +11,8 @@ from pathlib import Path
 
 from src.vm_manager.models import Base
 
-load_dotenv(Path(__file__).parent.parent / '.env')
+if os.getenv("DOCKER_ENV", ) != "true":
+    load_dotenv(Path(__file__).parent.parent / '.env')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

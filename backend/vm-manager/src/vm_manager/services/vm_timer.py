@@ -10,7 +10,8 @@ from ..schemas import (
     VMStatus,
 )
 
-load_dotenv(Path(__file__).parent.parent / '.env')
+if os.getenv("DOCKER_ENV") != "true":
+    load_dotenv(Path(__file__).parent.parent / '.env')
 
 # Асинхронный клиент для воркера
 async_redis_client = redis.Redis(

@@ -34,9 +34,10 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-from src.vm_manager.models import Base
+from vm_manager.models import Base
 
-load_dotenv(Path(__file__).parent.parent / '.env')
+if os.getenv("DOCKER_ENV") != "true":
+    load_dotenv(Path(__file__).parent.parent / '.env')
 
 router = APIRouter()
 tf_manager = TerraformManager()

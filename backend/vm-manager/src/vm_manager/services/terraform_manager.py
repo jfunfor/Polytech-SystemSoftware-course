@@ -5,8 +5,13 @@ import yaml
 import uuid
 import shutil
 import  json
+from dotenv import load_dotenv
+import os
 from jinja2 import Template
 from python_terraform import Terraform
+
+if os.getenv("DOCKER_ENV") != "true":
+    load_dotenv(Path(__file__).parent.parent / '.env')
 
 class TerraformManager:
     def __init__(self):
@@ -27,25 +32,17 @@ class TerraformManager:
         vm_dir.mkdir(parents=True, exist_ok=True)
 
         ssh_password = secrets.token_urlsafe(12)
-        for file in ["variables.tf", "provider.tf", "outputs.tf", "secrets.auto.tfvars", "main.tf"]:
+        for file in ["variables.tf", "provider.tf", "outputs.tf", "main.tf"]:
             shutil.copy(f"./terraform/{file}", vm_dir)
-        #self.generate_cloud_init(vm_dir, "admin", ssh_password)
 
-        # with open("terraform/templates/vm.tf.j2") as f:
-        #     main_tf = Template(f.read()).render(
-        #         vm_name=vm_name,
-        #         cpu_cores=cpu_cores,
-        #         memory_gb=memory_gb,
-        #         disk_size_gb=20
-        #     )
-        # (vm_dir / "main.tf").write_text(main_tf)
-
-        # with open("terraform/templates/outputs.tf.j2") as f:
-        #     outputs_tf = Template(f.read()).render(
-        #         vm_id=vm_id
-        #     )
-        # (vm_dir / "outputs.tf").write_text(outputs_tf)
-
+        secrets_content = f"""
+            proxmox_api_token_secret = "{os.getenv('PROXMOX_API_TOKEN_SECRET')}"
+            proxmox_api_token_id = "{os.getenv('PROXMOX_API_TOKEN_ID')}"
+            proxmox_api_url = "{os.getenv('PROXMOX_API_URL')}"
+        """
+        print(secrets_content, flush=True)
+        (vm_dir / "secrets.auto.tfvars").write_text(secrets_content)
+        
         tfvars_content = f"""
             vm_name = "{vm_name}"
             cpu_cores = {cpu_cores}
@@ -57,11 +54,6 @@ class TerraformManager:
         (vm_dir / "terraform.tfvars").write_text(tfvars_content.strip())
 
         try:
-            # init_code, init_stdout, init_stderr = self.terraform.init(
-            #     working_dir=Path(vm_dir).resolve(),
-            #     capture_output=True            )
-            # if init_code != 0:
-            #     raise Exception(f"Terraform init failed: {init_stderr}")
             init_result = subprocess.run(
                 ["terraform", "init"],
                 capture_output=True, text=True, cwd=str(vm_dir),
@@ -88,6 +80,10 @@ class TerraformManager:
         except Exception as e:
             print(f"Error: {str(e)}")
             raise
+        finally:
+            secrets_file = vm_dir / "secrets.auto.tfvars"
+            if secrets_file.exists():
+                secrets_file.unlink()
 
         return {
             "vm_id": vm_id,
