@@ -38,4 +38,4 @@ ENV REDIS_PASS="redispass"
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src.vm_manager.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn src.vm_manager.main:app --host 0.0.0.0 --port 8000"]
