@@ -34,7 +34,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-from vm_manager.models import Base
+from src.vm_manager.models import Base
 
 if os.getenv("DOCKER_ENV") != "true":
     load_dotenv(Path(__file__).parent.parent / '.env')
