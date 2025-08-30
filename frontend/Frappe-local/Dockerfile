@@ -1,18 +1,26 @@
 FROM python:3.11-slim
 
-# Устанавливаем зависимости
+# Устанавливаем системные зависимости (dev-пакеты для сборки Python-библиотек)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     nodejs \
     npm \
-    mariadb-server \
-    redis-server \
-    wkhtmltopdf \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpq-dev \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем yarn
 RUN npm install -g yarn
+
+# Устанавливаем frappe-bench (CLI)
+RUN pip install --no-cache-dir --prefer-binary frappe-bench
 
 # Рабочая директория
 WORKDIR /home/frappe/frappe-bench
@@ -20,16 +28,19 @@ WORKDIR /home/frappe/frappe-bench
 # Копируем проект
 COPY . .
 
-# Python-зависимости
-RUN pip install --no-cache-dir -r requirements.txt
+# Устанавливаем Python-зависимости (с приоритетом бинарных колёс)
+RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
 
-# Собираем фронт (если есть)
+RUN useradd -ms /bin/bash nastya
+
+RUN mkdir -p /home/frappe/frappe-bench/logs && \
+    chown -R nastya:nastya /home/frappe/frappe-bench
+
+# Собираем фронтенд (если есть)
 RUN cd apps/lms/frontend && yarn install && yarn build || echo "no frontend"
 
 # Открываем порт
 EXPOSE 8000
 
-# Скрипт запуска: сначала MariaDB и Redis, потом Frappe
-CMD service mariadb start && \
-    service redis-server start && \
-    bench start
+# Запускаем только frappe (без mariadb/redis)
+CMD ["bench", "start"]
