@@ -40,7 +40,7 @@ class TerraformManager:
             proxmox_api_token_id = "{os.getenv('PROXMOX_API_TOKEN_ID')}"
             proxmox_api_url = "{os.getenv('PROXMOX_API_URL')}"
         """
-        print(secrets_content, flush=True)
+        #print(secrets_content, flush=True)
         (vm_dir / "secrets.auto.tfvars").write_text(secrets_content)
         
         tfvars_content = f"""
