@@ -25,8 +25,23 @@ resource "proxmox_vm_qemu" "vm" {
                       replicate       = true
                   }
               }
+              scsi1 {
+                disk {
+                size      = "2G"
+                storage   = "local-lvm"
+                replicate = true
+                }
+            }
+            scsi2 {
+                disk {
+                size      = "2G"
+                storage   = "local-lvm"
+                replicate = true
+                }
+            }
           }
   }
+
 
   network {
     model  = "virtio"

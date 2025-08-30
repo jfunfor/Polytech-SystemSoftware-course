@@ -17,23 +17,28 @@ class RemoteDeployer:
         return output, error
     
     def add_ed25519_private_key(self, ssh_key=None, remote_path=None):
-
         if not ssh_key:
-            raise ValueError(f'Переменная окружения не установлена или пуста.')
+            raise ValueError('Переменная окружения не установлена или пуста.')
 
         if remote_path is None:
             remote_path = f'/home/{self.username}/.ssh/id_ed25519'
 
+        # Преобразуем \n в реальные переносы строк
+        decoded_key = ssh_key.strip().replace('\\n', '\n')
+        
+        # Экранируем специальные символы
+        escaped_key = decoded_key.replace('"', '\\"').replace('$', '\\$').replace('`', '\\`')
+        
         commands = [
             f'mkdir -p /home/{self.username}/.ssh',
-            f'echo "{ssh_key.strip()}" > {remote_path}',
+            f'echo -e "{escaped_key}" > {remote_path}',
             f'chmod 600 {remote_path}',
             f'chown {self.username}:{self.username} {remote_path}'
         ]
+        
         for cmd in commands:
             self.execute_command(cmd)
         return True
-    
     
     def install_build_essential(self):
         #cmd = "sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential"
