@@ -24,25 +24,23 @@ RUN cp /app/terraform-provider-proxmox_v3.0.1-rc2 /app/terraform/plugins/registr
     && chmod +x /app/terraform/plugins/registry.terraform.io/telmate/proxmox/3.0.1-rc2/linux_amd64/terraform-provider-proxmox_v3.0.1-rc2
 
 ARG PROXMOX_API_TOKEN_SECRET_ARG
-ENV PROXMOX_API_TOKEN_SECRET=${PROXMOX_API_TOKEN_SECRET_ARG}
+ARG DATABASE_URL_ARG
+ARG SSH_PRIVATE_KEY_ARG
+ARG REDIS_PASS_ARG
 
-ENV DATABASE_URL="postgresql://postgres:zZ00000@host.docker.internal:5432/vm_manager"
+ENV DATABASE_URL=${DATABASE_URL_ARG}
 ENV VM_TTL_SECONDS="3600"
 ENV DOCKER_ENV="true"
 ENV RECIPE_REPO_URL="git@github.com:jfunfor/Polytech-SystemSoftware-course.git"
-ENV SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----\n\
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\n\
-QyNTUxOQAAACBsk9nfKJ1/cBb2hEmitaS+auv+KwEPLgEuIna7cFtJ0gAAAJgC32sSAt9r\n\
-EgAAAAtzc2gtZWQyNTUxOQAAACBsk9nfKJ1/cBb2hEmitaS+auv+KwEPLgEuIna7cFtJ0g\n\
-AAAEAjv7WSLrdTRfeu0/RBzTlP19XvUhsCrFWJgjvGLdsIA2yT2d8onX9wFvaESaK1pL5q\n\
-6/4rAQ8uAS4idrtwW0nSAAAADnVzZXJAU1BCLU5CLTE4AQIDBAUGBw==\n\
------END OPENSSH PRIVATE KEY-----"
+ENV SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY_ARG}
+
+ENV PROXMOX_API_TOKEN_SECRET=${PROXMOX_API_TOKEN_SECRET_ARG}
 ENV PROXMOX_API_TOKEN_ID="root@pam!vm-manager"
 ENV PROXMOX_API_URL="http://10.160.163.103:8006/api2/json"
 
 ENV REDIS_HOST="10.160.160.202"
 ENV REDIS_PORT="6379"
-ENV REDIS_PASS="redispass"
+ENV REDIS_PASS=${REDIS_PASS_ARG}
 
 EXPOSE 8000
 
