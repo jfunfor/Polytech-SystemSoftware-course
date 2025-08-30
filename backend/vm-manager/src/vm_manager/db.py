@@ -4,7 +4,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-load_dotenv(Path(__file__).parent.parent.parent / '.env')
+if os.getenv("DOCKER_ENV") != "true":
+    load_dotenv(Path(__file__).parent.parent.parent / '.env')
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL не задан")

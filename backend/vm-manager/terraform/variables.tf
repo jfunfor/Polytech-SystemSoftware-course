@@ -1,26 +1,15 @@
-variable "yc_token" {
+variable "proxmox_api_url" {
   description = "IAM-токен для доступа к Yandex Cloud"
   type        = string
 }
 
-variable "yc_cloud_id" {
+variable "proxmox_api_token_id" {
   description = "ID облака в Yandex Cloud"
   type        = string
 }
 
-variable "yc_folder_id" {
+variable "proxmox_api_token_secret" {
   description = "ID каталога (folder) в облаке"
-  type        = string
-}
-
-variable "yc_zone" {
-  description = "Зона доступности Yandex Cloud"
-  type        = string
-  default     = "ru-central1-a"  # можно установить значение по умолчанию
-}
-
-variable "yc_subnet_id" {
-  description = "ID подсети для подключения ВМ"
   type        = string
 }
 
@@ -42,4 +31,16 @@ variable "memory_gb" {
 variable "disk_size_gb" {
   description = "Размер диска в Гб"
   type        = number
+}
+
+variable "vm_user"{
+  description = "Пользователь ssh"
+  type        = string
+}
+
+variable "vm_password"{
+  description = "Пароль ssh"
+  type        = string
+  sensitive   = true
+
 }

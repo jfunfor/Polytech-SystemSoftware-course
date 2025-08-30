@@ -15,3 +15,6 @@ class VM(Base):
     ssh_password = Column(String, nullable=False)
     ip_addres = Column(String, default='0.0.0.0', nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    task_id = Column(String, nullable=False)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    status = Column(String, nullable=True)
