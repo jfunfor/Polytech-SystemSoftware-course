@@ -1,19 +1,22 @@
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y gcc libpq-dev curl unzip && rm -rf /var/lib/apt/lists/*
 
 COPY terraform_bin /usr/local/bin/terraform
 RUN chmod +x /usr/local/bin/terraform
 
-RUN curl -sSL https://install.python-poetry.org | python3 -  
-ENV PATH="/root/.local/bin:$PATH"
-
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* /app/
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root
+# Копируем файл зависимостей для установки через pip
+COPY requirements.txt /app/
 
+# Создаем виртуальное окружение и устанавливаем зависимости
+RUN python3 -m venv /opt/venv \
+    && . /opt/venv/bin/activate \
+    && pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+# Копируем весь код приложения
 COPY . .
 
 COPY .terraformrc /root/.terraformrc
@@ -27,6 +30,15 @@ ARG PROXMOX_API_TOKEN_SECRET_ARG
 ARG DATABASE_URL_ARG
 ARG SSH_PRIVATE_KEY_ARG
 ARG REDIS_PASS_ARG
+ARG KEYCLOAK_URL_ARG
+ARG KEYCLOAK_VM_MANAGER_ID_ARG
+ARG KEYCLOAK_VM_MANAGER_SECRET_ARG
+ARG KEYCLOAK_REALM_ARG
+
+ENV KEYCLOAK_URL=${KEYCLOAK_URL_ARG}
+ENV KEYCLOAK_VM_MANAGER_ID=${KEYCLOAK_VM_MANAGER_ID_ARG}
+ENV KEYCLOAK_VM_MANAGER_SECRET=${KEYCLOAK_VM_MANAGER_SECRET_ARG}
+ENV KEYCLOAK_REALM=${KEYCLOAK_REALM_ARG}
 
 ENV DATABASE_URL=${DATABASE_URL_ARG}
 ENV VM_TTL_SECONDS="3600"
@@ -44,4 +56,4 @@ ENV REDIS_PASS=${REDIS_PASS_ARG}
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn src.vm_manager.main:app --host 0.0.0.0 --port 8000"]
+CMD ["/bin/sh", "-c", ". /opt/venv/bin/activate && alembic upgrade head && uvicorn src.vm_manager.main:app --host 0.0.0.0 --port 8000"]
