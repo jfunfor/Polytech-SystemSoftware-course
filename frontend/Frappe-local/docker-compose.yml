@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: frappe
+      MYSQL_USER: frappe
+      MYSQL_PASSWORD: frappe
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  redis-cache:
+    image: redis:6.2
+    container_name: redis-cache
+    restart: always
+
+  redis-queue:
+    image: redis:6.2
+    container_name: redis-queue
+    restart: always
+
+  redis-socketio:
+    image: redis:6.2
+    container_name: redis-socketio
+    restart: always
+
+  frappe:
+    image: tassiiyya/linuxlearning:latest
+    container_name: frappe
+    restart: always
+    depends_on:
+      - mariadb
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+    ports:
+      - "8000:8000"    # веб-интерфейс Frappe
+    volumes:
+      - ./sites:/home/frappe/frappe-bench/sites
+      - ./logs:/home/frappe/frappe-bench/logs
+    environment:
+      DB_HOST: mariadb
+      REDIS_CACHE: redis-cache:6379
+      REDIS_QUEUE: redis-queue:6379
+      REDIS_SOCKETIO: redis-socketio:6379
+      SOCKETIO_PORT: 9000
+      MARIADB_ROOT_PASSWORD: root
+      USER: root         # чтобы bench не искал nastya
+
+volumes:
+  mariadb-data:
