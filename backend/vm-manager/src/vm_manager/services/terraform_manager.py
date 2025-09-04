@@ -79,10 +79,6 @@ class TerraformManager:
         except Exception as e:
             print(f"Error: {str(e)}")
             raise
-        finally:
-            secrets_file = vm_dir / "secrets.auto.tfvars"
-            if secrets_file.exists():
-                secrets_file.unlink()
 
         return {
             "vm_id": vm_id,
