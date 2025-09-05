@@ -1,5 +1,8 @@
 {
  "db_name": "_a5bfa8d5e9333f5c",
  "db_password": "aOF7bzYth4J83ZHL",
- "db_type": "mariadb"
+ "db_type": "mariadb",
+  "redis_cache": "redis://10.160.160.202:6379",
+  "redis_queue": "redis://10.160.160.202:6379",
+  "redis_socketio": "redis://10.160.160.202:6379"
 }
