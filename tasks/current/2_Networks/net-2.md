@@ -15,28 +15,28 @@
 - `client` — ваша машина;
 - `router1` — роутер с IP `10.10.10.1`;
 - `router2` — роутер с IP `10.20.20.1`;
-- `router_batya` — суровый Linux-роутер, где `iptables` всё блочит, кроме ICMP;
-- `gosuslugi` — конечная цель с IP `10.30.30.10`, отвечает на ICMP с payload `"пж"`.
+- `router_reserve` — суровый Linux-роутер, где `iptables` всё блочит, кроме ICMP;
+- `target` — конечная цель с IP `10.30.30.10`, отвечает на ICMP с payload `"пж"`.
 
 **Что нужно сделать:**
-1. Настроить маршруты на клиенте и роутерах, чтобы ICMP дошёл до `gosuslugi`.
+1. Настроить маршруты на клиенте и роутерах, чтобы ICMP дошёл до `target`.
 2. Отправить ICMP Echo-запрос со специальным payload: `пж`.
-3. Получить ICMP Echo-reply с флагом: `GOSU-PASS-[...код...]`.
-4. Написать скрипт `client/ping_gosu.sh`, который должен:
+3. Получить ICMP Echo-reply с флагом: `TARGET-PASS-[...код...]`.
+4. Написать скрипт `client/ping_target.sh`, который должен:
 	- послать ICMP с нужным payload (можно `hping3`, `ping -p`, `scapy`, `python`);
 	- распарсить ответ и вывести код из полученного флага в `stdout`.
 
 Схема сети:
 
 ```
-client (10.10.10.2) → router1 (10.10.10.1, 10.20.20.1) → router2 (10.20.20.2, 10.25.25.2) → router_batya (10.25.25.1, 10.30.30.1) → gosuslugi (10.30.30.10)
+client (10.10.10.2) → router1 (10.10.10.1, 10.20.20.1) → router2 (10.20.20.2, 10.25.25.2) → router_reserve (10.25.25.1, 10.30.30.1) → target (10.30.30.10)
 ```
 
 Ожидаемый результат:
 
 ```
 ...
-$ docker exec client ping -c 2 10.30.30.10                    # проверка связи с gosuslugi
+$ docker exec client ping -c 2 10.30.30.10                    # проверка связи с target
 PING 10.30.30.10 (10.30.30.10): 56 data bytes
 64 bytes from 10.30.30.10: seq=0 ttl=63 time=0.587 ms
 64 bytes from 10.30.30.10: seq=1 ttl=63 time=0.417 ms
@@ -48,7 +48,7 @@ traceroute to 10.30.30.10 (10.30.30.10), 30 hops max
  3  10.25.25.1 (10.25.25.1)  0.010 ms  0.008 ms  0.007 ms
  4  10.30.30.10 (10.30.30.10)  0.014 ms  0.012 ms  0.011 ms
 ...
-$ docker exec client /ping_gosu.sh                            # проверка работы вашего скрипта
+$ docker exec client /ping_target.sh                            # проверка работы вашего скрипта
 123
 ```
 
@@ -58,14 +58,14 @@ $ docker exec client /ping_gosu.sh                            # проверка
 /home/student/net-2/
 ├── client/
 │	├── Dockerfile
-│   └── ping_gosu.sh          # ваш скрипт (решение)
+│   └── ping_target.sh          # ваш скрипт (решение)
 ├── router1/
 │   └── Dockerfile
 ├── router2/
 │   └── Dockerfile
-├── router_batya/
+├── router_reserve/
 │   └── Dockerfile
-├── gosuslugi/
+├── target/
 │	├── Dockerfile
 │   ├── exprsp                # служебный исполняемый файл
 │   └── ping_responder.py     # обработчик ICMP (проверка, генерирует одинаковый код)   

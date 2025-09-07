@@ -17,8 +17,8 @@
 	- `sdb2` — 1GB, под swap;
 	- `sdb3` — остальное, под корневую файловую систему `/`, использовать `ext4`.
 2. Отформатируйте каждую файловую систему соответствующим образом, а затем смонтируйте:
-	- `sdb1` → `/mnt/kangtao/boot`;
-	- `sdb3` → `/mnt/kangtao/`;
+	- `sdb1` → `/mnt/vaccine/boot`;
+	- `sdb3` → `/mnt/vaccine/`;
 	- swap — активировать.
 3. Добавить автоматическое монтирование, внеся записи в `/etc/fstab` для всех разделов.
 
@@ -34,13 +34,13 @@ Device     Boot    Start      End  Sectors  Size Id Type
 $ ...
 NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
 sdb                                                      
-├─sdb1 ext2         a1b2c3d4-1234-5678-9101-112131415161 /mnt/kangtao/boot
+├─sdb1 ext2         a1b2c3d4-1234-5678-9101-112131415161 /mnt/vaccine/boot
 ├─sdb2 swap         1a2b3c4d-5678-9101-1121-314151617181 [SWAP]
-└─sdb3 ext4         e5f6g7h8-9101-1121-3141-516171819202 /mnt/kangtao
+└─sdb3 ext4         e5f6g7h8-9101-1121-3141-516171819202 /mnt/vaccine
 
 $ ...
-/dev/sdb1 on /mnt/kangtao/boot type ext2 (rw,relatime)
-/dev/sdb3 on /mnt/kangtao type ext4 (rw,relatime)
+/dev/sdb1 on /mnt/vaccine/boot type ext2 (rw,relatime)
+/dev/sdb3 on /mnt/vaccine type ext4 (rw,relatime)
 
 $ ...
 NAME      TYPE      SIZE USED PRIO
