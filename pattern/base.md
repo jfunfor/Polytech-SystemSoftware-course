@@ -3,10 +3,10 @@
 
 *Предпосылка к заданию*
 
-![](images/bar.png)
+![](images/bars/bar.png)
 
 *Условие задачи*
-![](images/dialog_lumi.png)
+![](images/dialogs/dialog_lumi.png)
 
 ### Задача:
 
