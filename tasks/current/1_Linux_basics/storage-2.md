@@ -11,7 +11,7 @@
 
 ### Ваша задача:
 
-1. Подготовьте 2 физических тома (physical volume, PV) — создайте PV на `/dev/sdc` и `/dev/sdd`.
+1. Подготовьте 2 физических тома (physical volume, PV) — создайте PV на `/dev/sdb` и `/dev/sdc`.
 2. Создайте группу томов (volume group, VG) `vaccine_vg`.
 3. Создайте 2 логических тома (logical volume, LV):
 	- `data_lv` — 1GB, файловая система `xfs`;
@@ -27,8 +27,8 @@
 ```
 $ pvs ...
 PV         VG           Fmt  Attr PSize PFree
+/dev/sdb   vaccine_vg lvm2 a-- 
 /dev/sdc   vaccine_vg lvm2 a-- 
-/dev/sdd   vaccine_vg lvm2 a-- 
 
 $ ...
 VG           #PV #LV #SN Attr   VSize   VFree
