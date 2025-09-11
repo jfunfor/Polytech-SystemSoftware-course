@@ -1,0 +1,132 @@
+# Recipe for task 'process-1'
+# v.0.2 -- 09.09.2025
+
+DEFINE ZG /tmp/zombie_general
+DEFINE ZG_CCODE %ZG%.c
+DEFINE ZG_LOG_FILE /tmp/zombie_army.log
+DEFINE ZG_STATUS_FILE /tmp/zombie_army.status
+
+SCRIPT
+#!/bin/bash
+
+cat > %ZG_CCODE% << 'EOF'
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+
+#define LOG_FILE "%ZG_LOG_FILE%"
+#define STATUS_FILE "%ZG_STATUS_FILE%"
+#define MAX_CHILDREN 3
+
+FILE *logfile;
+
+void log_pid(pid_t pid, const char *role) {
+    fprintf(logfile, "pid=%d:role=%s\n", pid, role);
+    fflush(logfile);
+}
+
+void write_status(const char *status) {
+    FILE *status_file = fopen(STATUS_FILE, "w");
+    if (status_file) {
+        fprintf(status_file, "status=%s:pid=%d:time=%ld\n",
+                status, getpid(), time(NULL));
+        fclose(status_file);
+    }
+}
+
+void sig_handler(int signo) {
+    switch(signo) {
+        case SIGUSR1:
+            write_status("graceful_exit");
+            fclose(logfile);
+            exit(0);
+            break;
+
+        case SIGTERM:
+        case SIGINT:
+            write_status("signal_ignored");
+            for (int i = 0; i < 2; i++) {
+                if (fork() == 0) exit(0);
+            }
+            break;
+
+        case SIGQUIT:
+            write_status("signal_ignored");
+            if (fork() == 0) {
+                if (fork() == 0) exit(0);
+                exit(0);
+            }
+            break;
+    }
+}
+
+void setup_signals() {
+    struct sigaction sa;
+    sa.sa_handler = sig_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGQUIT, &sa, NULL);
+}
+
+void create_zombie() {
+    pid_t pid = fork();
+    if (pid == 0) {
+        log_pid(getpid(), "zombie");
+        exit(0);
+    } else if (pid > 0) {
+        log_pid(pid, "zombie");
+    }
+}
+
+void create_orphan() {
+    pid_t pid = fork();
+    if (pid == 0) {
+        sleep(3600);
+        exit(0);
+    } else if (pid > 0) {
+        log_pid(pid, "orphan");
+    }
+}
+
+int main() {
+    logfile = fopen(LOG_FILE, "w");
+    if (!logfile) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+    write_status("running");
+    log_pid(getpid(), "general");
+    setup_signals();
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        if (i % 2 == 0) create_zombie();
+        else create_orphan();
+        sleep(1);
+    }
+    while (1) {
+        write_status("running");
+        sleep(5);
+        if (rand() % 3 == 0) create_zombie();
+    }
+
+    fclose(logfile);
+    return EXIT_SUCCESS;
+}
+
+EOF
+
+END_SCRIPT
+
+EXEC gcc %ZG_CCODE% -o %ZG%
+DELETE %ZG_CCODE%
+BACKGROUND nohup %ZG%
+

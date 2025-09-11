@@ -1,0 +1,116 @@
+# Recipe for task 'firewall-1'
+# v.0.2 -- 09.09.2025
+
+DEFINE HOME /home/student/
+DEFINE TASK_DIR %HOME%firewall-1/
+
+CREATE_DIR %TASK_DIR%
+
+SCRIPT
+#!/bin/bash
+
+set -e
+cd %TASK_DIR%
+echo "Cleanup..."
+docker-compose down 2>/dev/null || true
+docker network rm public_net private_net trusted_net 2>/dev/null || true
+sleep 5
+
+echo "Creating docker-compose.yml..."
+cat > %TASK_DIR%docker-compose.yml << 'EOF'
+services:
+  firewall:
+    image: ubuntu:22.04
+    container_name: firewall
+    networks:
+      public_net:
+      private_net:
+      trusted_net:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  attacker:
+    image: ubuntu:22.04
+    container_name: attacker
+    networks:
+      public_net:
+    cap_add:
+      - NET_ADMIN
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  drone:
+    image: ubuntu:22.04
+    container_name: drone
+    networks:
+      private_net:
+    cap_add:
+      - NET_ADMIN
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+networks:
+  public_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  private_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.99.0/24
+  trusted_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.66.66.0/24
+EOF
+
+echo "Starting containers..."
+docker-compose up -d
+sleep 5
+
+echo "Installing required packages..."
+install_packages() {
+    local container=$1
+    local packages=$2
+    docker exec $container bash -c "apt update && apt install -y $packages"
+}
+install_packages firewall "iproute2 iptables iputils-ping netcat curl socat"
+install_packages attacker "iproute2 iptables iputils-ping netcat curl socat"
+install_packages drone "iproute2 iptables iputils-ping netcat curl socat"
+
+echo "Configuring IP addresses..."
+set_ip() {
+    local container=$1
+    local interface=$2
+    local ip=$3
+    docker exec $container ip link set $interface down
+    docker exec $container ip addr flush dev $interface 2>/dev/null || true
+    docker exec $container ip addr add $ip dev $interface
+    docker exec $container ip link set $interface up
+    sleep 5
+}
+
+set_ip attacker eth0 10.10.10.2/24
+set_ip firewall eth0 10.10.10.1/24
+set_ip firewall eth1 192.168.99.1/24
+set_ip firewall eth2 10.66.66.1/24
+set_ip drone eth0 192.168.99.10/24
+
+echo "Configuring routing..."
+docker exec drone bash -c "
+ip route del default || true
+ip route add default via 192.168.99.1
+"
+docker exec attacker ip route add 192.168.99.0/24 via 10.10.10.1
+
+END_SCRIPT

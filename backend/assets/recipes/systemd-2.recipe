@@ -1,17 +1,16 @@
-# Recipe for task 'systemd-2' ('task1.9.2')
-# v.0.1 -- 17.08.2025
+# Recipe for task 'systemd-2'
+# v.0.2 -- 09.09.2025
 
-# Base directory for the task
-#CREATE_DIR /home/flopp/task1.9.2/
-CREATE_DIR /home/student/task1.9.2/
+DEFINE HOME /home/student/
+DEFINE TASK_DIR %HOME%systemd-2/
+DEFINE TASK_FILE %TASK_DIR%cerberus-log.sh
+
+CREATE_DIR %TASK_DIR%
 
 # Script for creating script file for the task
 SCRIPT
 #!/bin/bash
-#TASK_FILE="/home/flopp/task1.9.2/cerberus-log.sh"
-TASK_FILE="/home/student/task1.9.2/cerberus-log.sh"
-
-cat > "$TASK_FILE" << 'EOF'
+cat > %TASK_FILE% << 'EOF'
 #!/bin/bash
 # cerberus-log.sh - Simple telemetry logging script
 

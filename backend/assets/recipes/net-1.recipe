@@ -1,0 +1,217 @@
+# Recipe for task 'net-1'
+# v.0.2 -- 09.09.2025
+
+DEFINE HOME /home/student/
+DEFINE TASK_DIR %HOME%net-1/
+DEFINE TASK_FILE %TASK_DIR%task.json
+DEFINE REF_FILE %TASK_DIR%.ref.json
+DEFINE SCDFF_DIR /tmp/scdff/
+DEFINE SCDFF %SCDFF_DIR%scdff
+
+CREATE_DIR %TASK_DIR%
+CREATE_DIR %SCDFF_DIR%
+
+SCRIPT
+#!/bin/bash
+
+DOMAINS=("github.com" "kernel.org" "gitlab.com" "example.com" "google.com" "yandex.ru")
+PORTS=(80 443 22 53 8080 21 25)
+DNS_TYPES=("A" "MX" "TXT")
+
+DOMAIN=${DOMAINS[$RANDOM % ${#DOMAINS[@]}]}
+PORT=${PORTS[$RANDOM % ${#PORTS[@]}]}
+DNS_TYPE=${DNS_TYPES[$RANDOM % ${#DNS_TYPES[@]}]}
+
+cat > %TASK_FILE% << EOF
+{
+  "domain": "$DOMAIN",
+  "port": $PORT,
+  "dns_type": "$DNS_TYPE"
+  "hop": 3,
+  "tasks": {
+    "ping": "Определить процент успешных ответов от $DOMAIN (из 5 попыток)",
+    "traceroute": "Найти IP 3-го узла в маршруте к $DOMAIN",
+    "dns": "Получить $TYPE-запись для $DOMAIN",
+    "port_scan": "Проверить, открыт ли порт $PORT на $DOMAIN",
+    "listen_ports": "Подсчитать количество LISTEN-портов на машине"
+}
+EOF
+
+echo "Task generated. Collecting reference data..."
+
+# 1. Ping
+PING_LOSS=$(ping -c 3 -W 2 "$DOMAIN" 2>/dev/null | grep "packet loss" | awk '{print $6}' | tr -d '%')
+[ -z "$PING_LOSS" ] && PING_LOSS="100"
+
+# 2. Traceroute
+HOP3_IP=$(timeout 10 traceroute -n -m 3 -w 1 "$DOMAIN" 2>/dev/null | awk 'NR==4 {print $2}')
+[ -z "$HOP3_IP" ] || [ "$HOP3_IP" = "*" ] && HOP3_IP="0.0.0.0"
+
+# 3. DNS
+DNS_RES=$(dig +short +time=2 +tries=1 "$DOMAIN" "$DNS_TYPE" 2>/dev/null | head -1)
+[ -z "$DNS_RES" ] && DNS_RES="not_found"
+
+# 4. Port scan
+timeout 5 nc -zv -w 2 "$DOMAIN" "$PORT" 2>&1 | grep -q "succeeded" && PORT_STATE="open" || PORT_STATE="closed"
+
+# 5. Listen ports
+LISTEN_COUNT=$(ss -tuln 2>/dev/null | grep -c "LISTEN")
+
+cat > %REF_FILE% << EOF
+{
+  "ping_loss": "$PING_LOSS",
+  "traceroute_hop_3": "$HOP3_IP",
+  "dns_result": "$DNS_RES",
+  "port_scan": "$PORT_STATE",
+  "listen_ports": "$LISTEN_COUNT"
+}
+EOF
+
+echo "Reference data saved. Starting scdff..."
+
+END_SCRIPT
+
+SCRIPT
+#!/bin/bash
+
+cat > %SCDFF_DIR%scdff.c << 'EOF'
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define BUF_SIZE 4096
+
+static volatile sig_atomic_t signal_received = 0;
+static char *file_content = NULL;
+static size_t file_size = 0;
+static char *output_path = NULL;
+
+void signal_handler(int sig) {
+    signal_received = sig;
+}
+
+int read_file(const char *filename) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        perror("open input file");
+        return -1;
+    }
+    struct stat st;
+    if (fstat(fd, &st) == -1) {
+        perror("fstat");
+        close(fd);
+        return -1;
+    }
+    file_size = st.st_size;
+    file_content = malloc(file_size);
+    if (!file_content) {
+        perror("malloc");
+        close(fd);
+        return -1;
+    }
+    ssize_t bytes_read = read(fd, file_content, file_size);
+    if (bytes_read != file_size) {
+        perror("read");
+        free(file_content);
+        file_content = NULL;
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+int write_file() {
+    if (!file_content || !output_path) {
+        return -1;
+    }
+    int fd = open(output_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open output file");
+        return -1;
+    }
+    ssize_t bytes_written = write(fd, file_content, file_size);
+    if (bytes_written != file_size) {
+        perror("write");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+void daemonize() {
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    if (setsid() < 0) {
+        perror("setsid");
+        exit(EXIT_FAILURE);
+    }
+    umask(0);
+    if (chdir("/") < 0) {
+        perror("chdir");
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <input_file> <output_file>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    const char *input_file = argv[1];
+    output_path = argv[2];
+    if (read_file(input_file) != 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (unlink(input_file) == -1) {
+        perror("unlink input file");
+        free(file_content);
+        exit(EXIT_FAILURE);
+    }
+    daemonize();
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    if (sigaction(SIGUSR1, &sa, NULL) == -1 ||
+        sigaction(SIGTERM, &sa, NULL) == -1 ||
+        sigaction(SIGINT, &sa, NULL) == -1) {
+        free(file_content);
+        exit(EXIT_FAILURE);
+    }
+    while (1) {
+        pause();
+        if (signal_received == SIGUSR1) {
+            write_file();
+        } else if (signal_received == SIGTERM || signal_received == SIGINT) {
+            break;
+        }
+        signal_received = 0;
+    }
+    free(file_content);
+    return EXIT_SUCCESS;
+}
+
+EOF
+
+END_SCRIPT
+
+EXEC gcc %SCDFF_DIR%scdff.c -o %SCDFF%
+DELETE %SCDFF_DIR%scdff.c
+EXEC %SCDFF% %REF_FILE% %REF_FILE%

@@ -1,12 +1,15 @@
-# Recipe for task 'textproc-2' ('task1.4.2')
-# v.0.1 -- 17.08.2025
+# Recipe for task 'textproc-2'
+# v.0.2 -- 09.09.2025
 
-# TODO: Make backup files in /var/tmp/
-# TODO: Calculate SHA-1 and store it in /var/tmp/ as well
+DEFINE HOME /home/student/
+DEFINE TASK_DIR %HOME%textproc-2/
+DEFINE ORIGINAL_JSON %TASK_DIR%manifest.json
+DEFINE BACKUP_DIR /tmp/bk/
+DEFINE BACKUP_JSON %BACKUP_DIR%.manifest.json
+DEFINE BACKUP_SHA1 %BACKUP_DIR%.sha1
 
-# Base directory for the task
-#CREATE_DIR /home/flopp/task1.4.2/
-CREATE_DIR /home/student/task1.4.2/
+CREATE_DIR %TASK_DIR%
+CREATE_DIR %BACKUP_DIR%
 
 # Script for creating random logs
 SCRIPT
@@ -15,12 +18,9 @@ import random
 import json
 import yaml
 
-#home_dir = "/home/flopp/"
-home_dir = "/home/student/"
-task_dir = "task1.4.2/"
+task_dir = "%TASK_DIR%"
 
 def generate_entries(count=1000):
-    """Generate random manifest entries."""
     modules = ['core', 'net', 'auth', 'sys']
     statuses = ['active', 'inactive']
     priorities = random.sample(range(1, 1001), count)
@@ -36,13 +36,12 @@ def generate_entries(count=1000):
         entries.append(entry)
     return entries
 
-def write_json_file(entries, filename=f'{home_dir}{task_dir}manifest.json'):
-    """Write entries to JSON file."""
+def write_json_file(entries, filename=f'{task_dir}manifest.json'):
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(entries, f, indent=2)
+        f.write('\n')
 
-def write_yaml_file(entries, filename=f'{home_dir}{task_dir}manifest.yaml'):
-    """Write entries to YAML file."""
+def write_yaml_file(entries, filename=f'{task_dir}manifest.yaml'):
     yaml_entries = []
     for entry in entries:
         yaml_entries.append({
@@ -55,14 +54,11 @@ def write_yaml_file(entries, filename=f'{home_dir}{task_dir}manifest.yaml'):
 
 def main():
     try:
-        # Generate 1000 random entries
         entries = generate_entries(1000)
         
-        # Write JSON file
         write_json_file(entries)
         print("Successfully generated manifest.json")
         
-        # Write YAML file
         write_yaml_file(entries)
         print("Successfully generated manifest.yaml")
         
@@ -74,3 +70,6 @@ if __name__ == "__main__":
     import sys
     main()
 END_SCRIPT
+
+COPY %ORIGINAL_JSON% %BACKUP_JSON%
+EXEC sha1sum %ORIGINAL_JSON% > %BACKUP_SHA1%

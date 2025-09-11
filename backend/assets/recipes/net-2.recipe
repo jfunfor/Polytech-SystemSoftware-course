@@ -1,0 +1,431 @@
+# Recipe for task 'net-2'
+# v.0.2 -- 09.09.2025
+
+DEFINE HOME /home/student/
+DEFINE TASK_DIR %HOME%net-2/
+DEFINE SCDFF_DIR /tmp/scdff/
+DEFINE SCDFF %SCDFF_DIR%scdff
+DEFINE PING_FILE %TASK_DIR%ping_responder.py
+
+CREATE_DIR %TASK_DIR%
+CREATE_DIR %SCDFF_DIR%
+
+SCRIPT
+#!/bin/bash
+
+cat > %PING_FILE% << 'EOF'
+#!/usr/bin/env python3
+
+"""
+DO NOT MODIFY OR DELETE THIS SCRIPT!
+"""
+
+import socket
+import struct
+import time
+
+TARGET_CODE = "1234"
+FLAG_PREFIX = f"TARGET-PASS-{TARGET_CODE}"
+
+def calculate_checksum(data):
+    if len(data) % 2:
+        data += b'\x00'
+    checksum = 0
+    for i in range(0, len(data), 2):
+        word = (data[i] << 8) + data[i+1]
+        checksum += word
+        checksum = (checksum & 0xffff) + (checksum >> 16)
+    return ~checksum & 0xffff
+
+def main():
+    print("Starting simple ICMP responder...")
+    print(f"Will respond to valid ICMP requests with: {FLAG_PREFIX}")
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+
+    while True:
+        try:
+            data, addr = sock.recvfrom(4096)
+
+            if len(data) >= 28 and data[20] == 8:
+                payload = data[28:] if len(data) > 28 else b''
+                print(f"Received ICMP request from {addr[0]}")
+
+                if b'\xd0\xbf\xd0\xb6' in payload:
+                    print("ICMP payload is valid")
+                    icmp_header = data[20:28]
+                    icmp_id = struct.unpack('!H', icmp_header[4:6])[0]
+                    icmp_seq = struct.unpack('!H', icmp_header[6:8])[0]
+                    reply_header = struct.pack('!BBHHH', 0, 0, 0, icmp_id, icmp_seq)
+                    reply_packet = reply_header + FLAG_PREFIX.encode()
+                    checksum = calculate_checksum(reply_packet)
+                    reply_packet = struct.pack('!BBHHH', 0, 0, checksum, icmp_id, icmp_seq) + FLAG_PREFIX.encode()
+                    sock.sendto(reply_packet, addr)
+                    print(f"Sent response to {addr[0]}: {FLAG_PREFIX}")
+
+        except Exception as e:
+            print(f"Error: {e}")
+            time.sleep(1)
+
+if __name__ == "__main__":
+    main()
+
+EOF
+END_SCRIPT
+
+SCRIPT
+#!/bin/bash
+
+set -e
+cd %TASK_DIR%
+echo "Cleanup..."
+docker-compose down 2>/dev/null || true
+docker network rm net1 net2 net3 net4 2>/dev/null || true
+sleep 5
+
+echo "Creating docker-compose.yml..."
+cat > %TASK_DIR%docker-compose.yml << 'EOF'
+services:
+  client:
+    image: ubuntu:22.04
+    container_name: client
+    networks:
+      net1:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  router1:
+    image: ubuntu:22.04
+    container_name: router1
+    networks:
+      net1:
+      net2:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  router2:
+    image: ubuntu:22.04
+    container_name: router2
+    networks:
+      net2:
+      net3:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  router_reserve:
+    image: ubuntu:22.04
+    container_name: router_reserve
+    networks:
+      net3:
+      net4:
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+  target:
+    image: ubuntu:22.04
+    container_name: target
+    networks:
+      net4:
+    cap_add:
+      - NET_ADMIN
+    tty: true
+    stdin_open: true
+    command: /bin/bash -c "sleep infinity"
+
+networks:
+  net1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.1.0/24
+  net2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.2.0/24
+  net3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.3.0/24
+  net4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.4.0/24
+EOF
+
+echo "Starting containers..."
+docker-compose up -d
+sleep 5
+
+echo "Installing required packages..."
+install_packages() {
+    local container=$1
+    local packages=$2
+    docker exec $container bash -c "apt update && apt install -y $packages"
+}
+install_packages client "iproute2 iputils-ping python3"
+install_packages router1 "iproute2 iptables iputils-ping"
+install_packages router2 "iproute2 iptables iputils-ping"
+install_packages router_reserve "iproute2 iptables iputils-ping"
+install_packages target "iproute2 iputils-ping python3"
+
+echo "Configuring IP addresses..."
+set_ip() {
+    local container=$1
+    local interface=$2
+    local ip=$3
+    docker exec $container ip addr flush dev $interface 2>/dev/null || true
+    docker exec $container ip addr add $ip dev $interface
+    docker exec $container ip link set $interface up
+    sleep 5
+}
+set_ip client eth0 10.10.10.2/24
+set_ip router1 eth0 10.10.10.1/24
+set_ip router1 eth1 10.20.20.1/24
+set_ip router2 eth0 10.20.20.2/24
+set_ip router2 eth1 10.25.25.2/24
+set_ip router_reserve eth0 10.25.25.1/24
+set_ip router_reserve eth1 10.30.30.1/24
+set_ip target eth0 10.30.30.10/24
+
+echo "Configuring routing..."
+docker exec router1 bash -c "
+echo 'Configuring router1...'
+ip route del default 2>/dev/null || true
+iptables -t nat -F 2>/dev/null || true
+iptables -F 2>/dev/null || true
+iptables -P FORWARD ACCEPT
+"
+sleep 5
+docker exec router2 bash -c "
+echo 'Configuring router2...'
+ip route del default 2>/dev/null || true
+iptables -t nat -F 2>/dev/null || true
+iptables -F 2>/dev/null || true
+iptables -P FORWARD ACCEPT
+"
+sleep 5
+docker exec router_reserve bash -c "
+echo 'Configuring router_reserve...'
+ip route del default 2>/dev/null || true
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A OUTPUT -p icmp -j ACCEPT
+iptables -A FORWARD -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+"
+sleep 5
+docker exec target bash -c "
+echo 'Configuring target...'
+ip route del default 2>/dev/null || true
+ip route add default via 10.30.30.1
+"
+sleep 5
+docker exec client bash -c "
+echo 'Configuring client...'
+ip route del default 2>/dev/null || true
+ip route add default via 10.10.10.1
+"
+sleep 5
+
+echo "Adding ping_responder.py on target..."
+docker cp ping_responder.py target:/root/ping_responder.py
+docker exec target chmod +x /root/ping_responder.py
+docker exec -d target python3 /root/ping_responder.py
+
+echo "Making template script for students..."
+mkdir -p %TASK_DIR%client
+cat > %TASK_DIR%client/ping_target.sh << 'EOF'
+#!/bin/bash
+
+# Шаблон скрипта для отправки ICMP запроса и получения кода
+# Файл должен лежать в 'client:/root/client/ping_target.sh'
+
+TARGET_IP="10.30.30.10"
+PAYLOAD="пж"
+
+echo "Не забудьте 'docker cp ping_target.sh client:/root/client/ping_target.sh'"
+
+EOF
+
+chmod +x %TASK_DIR%client/ping_target.sh
+
+END_SCRIPT
+
+
+SCRIPT
+#!/bin/bash
+
+cat > %SCDFF_DIR%scdff.c << 'EOF'
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define BUF_SIZE 4096
+
+static volatile sig_atomic_t signal_received = 0;
+static char *file_content = NULL;
+static size_t file_size = 0;
+static char *output_path = NULL;
+
+void signal_handler(int sig) {
+    signal_received = sig;
+}
+
+int read_file(const char *filename) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        perror("open input file");
+        return -1;
+    }
+    struct stat st;
+    if (fstat(fd, &st) == -1) {
+        perror("fstat");
+        close(fd);
+        return -1;
+    }
+    file_size = st.st_size;
+    file_content = malloc(file_size);
+    if (!file_content) {
+        perror("malloc");
+        close(fd);
+        return -1;
+    }
+    ssize_t bytes_read = read(fd, file_content, file_size);
+    if (bytes_read != file_size) {
+        perror("read");
+        free(file_content);
+        file_content = NULL;
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+int write_file() {
+    if (!file_content || !output_path) {
+        return -1;
+    }
+    int fd = open(output_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        perror("open output file");
+        return -1;
+    }
+    ssize_t bytes_written = write(fd, file_content, file_size);
+    if (bytes_written != file_size) {
+        perror("write");
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+void daemonize() {
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    if (setsid() < 0) {
+        perror("setsid");
+        exit(EXIT_FAILURE);
+    }
+    umask(0);
+    if (chdir("/") < 0) {
+        perror("chdir");
+        exit(EXIT_FAILURE);
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <input_file> <output_file>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    const char *input_file = argv[1];
+    output_path = argv[2];
+    if (read_file(input_file) != 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (unlink(input_file) == -1) {
+        perror("unlink input file");
+        free(file_content);
+        exit(EXIT_FAILURE);
+    }
+    daemonize();
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    if (sigaction(SIGUSR1, &sa, NULL) == -1 ||
+        sigaction(SIGTERM, &sa, NULL) == -1 ||
+        sigaction(SIGINT, &sa, NULL) == -1) {
+        free(file_content);
+        exit(EXIT_FAILURE);
+    }
+    while (1) {
+        pause();
+        if (signal_received == SIGUSR1) {
+            write_file();
+        } else if (signal_received == SIGTERM || signal_received == SIGINT) {
+            break;
+        }
+        signal_received = 0;
+    }
+    free(file_content);
+    return EXIT_SUCCESS;
+}
+
+EOF
+END_SCRIPT
+
+EXEC gcc %SCDFF_DIR%scdff.c -o %SCDFF%
+DELETE %SCDFF_DIR%scdff.c
+EXEC %SCDFF% %PING_FILE% %PING_FILE%
+
