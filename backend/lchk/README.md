@@ -1,17 +1,10 @@
 # lchk
 
-A library written in C that allows you to automate and simplify the process of checking assignments for the course "System Software".
+A full-fledged framework written in C for checking "System Software" course assignments.
 
 ### Build
 
-Dependencies: libcurl, openssl, cJSON.
-
 ```bash
 $ make
-$ cd bin
-$ ./lchk --help
+$ ./lchk -h
 ```
-
-### Usage
-
-The usage example with comments is given in the `main.c` file.
