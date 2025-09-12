@@ -3,6 +3,7 @@ from fastapi_keycloak_middleware import KeycloakConfiguration, setup_keycloak_mi
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+from starlette.middleware.cors import CORSMiddleware
 from .api.endpoints import router, lifespan
 
 if os.getenv("DOCKER_ENV") != "true":
@@ -18,6 +19,14 @@ keycloak_config = KeycloakConfiguration(
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 setup_keycloak_middleware(
     app,
