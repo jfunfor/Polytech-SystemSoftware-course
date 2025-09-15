@@ -18,7 +18,6 @@ keycloak_config = KeycloakConfiguration(
 )
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +26,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(router)
 
 setup_keycloak_middleware(
     app,
