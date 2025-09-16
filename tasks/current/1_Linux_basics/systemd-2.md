@@ -35,8 +35,9 @@ cerberus-telemetry/
 Файловая структура задания
 
 ```
-/home/student/systemd-2/  
-└── cerberus-log.sh               # bash-скрипт для пакета (не изменяйте)
+/home/student/systemd-2/
+├──  cerberus-log.sh               # bash-скрипт для пакета (не изменяйте)
+└──  cerberus-telemetry.deb        # .deb-пакет (решение)
 ```
 
 ### Итог выполнения задания
