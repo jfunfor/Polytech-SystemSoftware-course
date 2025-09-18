@@ -41,7 +41,7 @@ async def vm_cleanup_worker(tf_manager):
     print("Воркер очистки VM (pub/sub) запущен", flush=True)
     
     pubsub = async_redis_client.pubsub()
-    await pubsub.psubscribe('__keyevent@0__:expired')
+    await pubsub.psubscribe('__keyevent@1__:expired')
     
     try:
         async for message in pubsub.listen():
