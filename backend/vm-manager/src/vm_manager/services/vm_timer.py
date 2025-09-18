@@ -17,7 +17,7 @@ if os.getenv("DOCKER_ENV") != "true":
 async_redis_client = redis.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", "6379")),
-    db=0,
+    db=1,
     password=os.getenv("REDIS_PASS"),
     decode_responses=True,
 )
@@ -26,7 +26,7 @@ async_redis_client = redis.Redis(
 sync_redis_client = redis_sync.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", "6379")),
-    db=0,
+    db=1,
     password=os.getenv("REDIS_PASS", "localhost"),
     decode_responses=True,
 )
