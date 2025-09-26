@@ -51,7 +51,7 @@ async def create_vm(
 ):
     running_vms_count = db.query(func.count(VM.id)).filter(VM.status == VMStatus.RUNNING).scalar()
 
-    if running_vms_count >= 10:
+    if running_vms_count >= int(os.getenv("VMS_COUNT")):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Превышено максимальное количество активных VM (10). Попробуйте позже."
