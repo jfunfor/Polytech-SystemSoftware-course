@@ -90,13 +90,13 @@ async def create_vm(
 
     #conn.install_build_essential()
     conn.clone_recipe_repo(os.getenv("RECIPE_REPO_URL"))
-    conn.build_executable('make', 'Polytech-SystemSoftware-course/backend/recp')
+    conn.build_executable('make', 'pssc-backend/backend/recp')
     conn.run_executable(
         'recp',
-        args=f'-r ~/Polytech-SystemSoftware-course/backend/assets/recipes/{vm.task_id}.recipe',
-        work_dir='Polytech-SystemSoftware-course/backend/recp'
+        args=f'-r ~/pssc-backend/backend/assets/recipes/{vm.task_id}.recipe',
+        work_dir='pssc-backend/backend/recp'
     )
-    conn.delete_recipe_repo('Polytech-SystemSoftware-course/')
+    conn.delete_recipe_repo('pssc-backend/')
 
 
     conn.run_ttyd(auth_user=vm.ssh_user, auth_pwd=vm.ssh_password)
@@ -148,13 +148,13 @@ async def check_task(request: CheckTaskRequest, db = Depends(get_db)):
     )
 
     conn.clone_recipe_repo(os.getenv("RECIPE_REPO_URL"))
-    conn.build_executable('make', work_dir='Polytech-SystemSoftware-course/backend/lchk')
+    conn.build_executable('make', work_dir='pssc-backend/backend/lchk')
     output, err = conn.run_executable(
         'lchk',
         args=f'-t {vm.task_id} -f',
-        work_dir='Polytech-SystemSoftware-course/backend/lchk'
+        work_dir='pssc-backend/backend/lchk'
     )
-    conn.delete_recipe_repo('Polytech-SystemSoftware-course/')
+    conn.delete_recipe_repo('pssc-backend/')
 
     conn.close()
 

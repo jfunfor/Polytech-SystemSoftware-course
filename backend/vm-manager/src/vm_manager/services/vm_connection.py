@@ -47,17 +47,10 @@ class RemoteDeployer:
 
     def clone_recipe_repo(self, repo_url, dest_dir=None):
         if dest_dir is not None:
-            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone -b develop --no-checkout {repo_url} {dest_dir} && \
-                cd Polytech-SystemSoftware-course && \
-                git sparse-checkout init --cone && \
-                git sparse-checkout set backend/assets backend/lchk backend/recp && \
-                git checkout"
+            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone {repo_url} {dest_dir} && \
+                cd ~"
         else:
-            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone -b develop --no-checkout {repo_url} && \
-                cd Polytech-SystemSoftware-course && \
-                git sparse-checkout init --cone && \
-                git sparse-checkout set backend/assets backend/lchk backend/recp && \
-                git checkout && \
+            cmd = f"GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone {repo_url} && \
                 cd ~"
         return self.execute_command(cmd)
     
