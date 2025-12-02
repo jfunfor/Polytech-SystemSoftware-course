@@ -1,3 +1,50 @@
+# Список задач на курсе
+### Основы Linux
+   - textproc-1
+   - textproc-2
+   - storage-1
+   - storage-2
+   - storage-3
+   - package-1
+   - process-1
+   - systemd-1
+   - systemd-2
+   - bash-1
+
+   * task_extra_basics.md
+   * task_extra_bash.md
+
+### Сети
+   - net-1
+   - net-2
+   - net-3
+   - firewall-1
+
+   * task_extra_networks.md
+
+
+### Контейнеризация
+   - containers-1
+   - containers-2
+   - containers-3
+
+   * task_extra_docker.md
+
+### Мониторинг
+   - monitoring-1
+   - logging-1
+   - monitoring-2
+
+### Git (требует правок)
+   - git-1
+   - git-2
+   - git-3
+
+   * task_extra_git.md    
+
+
+
+# Основная информация
 Для генерации вопросов есть смысл просмотреть
 1. Текущие задачи на работе и учёбе
 2. Что требуется на рынке
